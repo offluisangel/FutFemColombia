@@ -1,0 +1,36 @@
+FutFemColombia
+Copyright (C) 2026 Luis Ángel Martínez
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+---
+
+Third-party software used by this project:
+
+Next.js          — MIT License    — Copyright (c) Vercel, Inc.
+React            — MIT License    — Copyright (c) Meta Platforms, Inc.
+Tailwind CSS     — MIT License    — Copyright (c) Tailwind Labs, Inc.
+Radix UI         — MIT License    — Copyright (c) WorkOS
+shadcn/ui        — MIT License    — Copyright (c) shadcn
+Framer Motion    — MIT License    — Copyright (c) Framer B.V.
+Supabase JS      — MIT License    — Copyright (c) Supabase
+Zod              — MIT License    — Copyright (c) Colin McDonnell
+Lucide React     — ISC License    — Copyright (c) Lucide Contributors
+Sonner           — MIT License    — Copyright (c) Emil Kowalski
+Cheerio          — MIT License    — Copyright (c) The Cheerio contributors
+clsx             — MIT License    — Copyright (c) Luke Edwards
+class-variance-authority  — Apache-2.0   — Copyright (c) Joe Bell
+tailwind-merge   — MIT License    — Copyright (c) Dany Castillo
+
+Full license texts for each dependency are available in https://opensource.org/licenses.
