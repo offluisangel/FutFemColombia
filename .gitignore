@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
+
+# Env
+.env*
+!.env.example
+
+# Tests / lint
+coverage/
+.eslintcache
+
+# Supabase CLI
+supabase/.temp/
+
+# Logs
+*.log
+pnpm-debug.log*
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project
+DATOS*.bat
