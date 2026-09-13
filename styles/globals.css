@@ -1,0 +1,147 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+    /* Lavender Rose palette */
+    --lavender-50: #fdecfa;
+    --lavender-100: #fbd6f5;
+    --lavender-200: #f8b3ed;
+    --lavender-300: #f592e7;
+    --lavender-400: #f371e2;
+    --lavender-500: #ea3dd7;
+    --lavender-600: #bf30af;
+    --lavender-700: #922386;
+    --lavender-800: #66155d;
+    --lavender-900: #3a0835;
+    --lavender-950: #240320;
+
+    /* Theme tokens mapped to palette */
+    --background: var(--lavender-900);
+    --foreground: var(--lavender-50);
+    --card: var(--lavender-800);
+    --card-foreground: var(--lavender-50);
+    --popover: var(--lavender-800);
+    --popover-foreground: var(--lavender-50);
+    --primary: var(--lavender-400);
+    --primary-foreground: var(--lavender-900);
+    --secondary: var(--lavender-800);
+    --secondary-foreground: var(--lavender-50);
+    --muted: var(--lavender-800);
+    --muted-foreground: var(--lavender-50);
+    --accent: var(--lavender-700);
+    --accent-foreground: var(--lavender-50);
+    --destructive: var(--lavender-600);
+    --destructive-foreground: var(--lavender-50);
+    --success: #6ee7a0;
+    --danger: #ff6b8a;
+    --foreground-muted: #fbd6f5;
+    --border: var(--lavender-700);
+    --input: var(--lavender-800);
+    --ring: var(--lavender-400);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --radius: 0.625rem;
+    --sidebar: var(--lavender-900);
+    --sidebar-foreground: var(--lavender-50);
+    --sidebar-primary: var(--lavender-700);
+    --sidebar-primary-foreground: var(--lavender-50);
+    --sidebar-accent: var(--lavender-800);
+    --sidebar-accent-foreground: var(--lavender-50);
+    --sidebar-border: var(--lavender-700);
+    --sidebar-ring: var(--lavender-400);
+
+    /* CSS variable aliases used by utility classes */
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-success: var(--success);
+    --color-danger: var(--danger);
+    --color-foreground-muted: var(--foreground-muted);
+}
+
+@layer base {
+    * {
+        border-color: var(--color-border);
+        outline-color: var(--color-ring);
+    }
+
+    :where(a, button, [role="button"], input, select, textarea, summary):focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+    }
+
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+    }
+}
+
+.scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
+.shields-scroll {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.shields-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.shields-marquee {
+    display: flex;
+    gap: 0.75rem;
+    width: max-content;
+    padding-right: 0.75rem;
+}
+
+.shields-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.desktop-marquee-wrapper {
+    overflow: hidden;
+    flex: 1;
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 6%,
+        black 94%,
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 6%,
+        black 94%,
+        transparent 100%
+    );
+}
