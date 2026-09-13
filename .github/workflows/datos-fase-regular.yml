@@ -1,0 +1,60 @@
+name: Datos - Fase regular
+
+on:
+  schedule:
+    - cron: "0 22 * * *" # 17:00 Colombia (UTC-5)
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger scrapers auto endpoint
+        env:
+          APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
+          SCRAPERS_CRON_SECRET: ${{ secrets.SCRAPERS_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${APP_BASE_URL:-}" ]; then
+            echo "APP_BASE_URL secret is missing"
+            exit 1
+          fi
+
+          if [ -z "${SCRAPERS_CRON_SECRET:-}" ]; then
+            echo "SCRAPERS_CRON_SECRET secret is missing"
+            exit 1
+          fi
+
+          HTTP_CODE=$(curl --silent --show-error --location \
+            --request POST \
+            --url "${APP_BASE_URL%/}/api/internal/scrapers/auto" \
+            --header "Authorization: Bearer $SCRAPERS_CRON_SECRET" \
+            --header "x-cron-secret: $SCRAPERS_CRON_SECRET" \
+            --header "Content-Type: application/json" \
+            --write-out "%{http_code}" \
+            --output /tmp/scrapers_auto_response.json)
+
+          RESPONSE="$(cat /tmp/scrapers_auto_response.json || echo '{}')"
+          echo "$RESPONSE"
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "Scrapers endpoint failed with HTTP $HTTP_CODE"
+            if [ "$HTTP_CODE" -eq 401 ]; then
+              echo "Hint: SCRAPERS_CRON_SECRET value mismatch between GitHub Actions secret and deployed app environment variable."
+            fi
+            if [ "$HTTP_CODE" -eq 503 ]; then
+              echo "Hint: verify SCRAPERS_CRON_SECRET is configured in the deployed app environment (Vercel dashboard → project settings → environment variables)."
+            fi
+            exit 1
+          fi
+
+          OK=$(echo "$RESPONSE" | python3 -c "import sys,json; print(str(json.load(sys.stdin).get('ok', False)))" 2>/dev/null || echo "False")
+          if [ "$OK" != "True" ]; then
+            APPLIED=$(echo "$RESPONSE" | python3 -c "import sys,json; r=json.load(sys.stdin); print(r.get('summary',{}).get('applied',0))" 2>/dev/null || echo "0")
+            PENDING=$(echo "$RESPONSE" | python3 -c "import sys,json; r=json.load(sys.stdin); print(r.get('summary',{}).get('pendingReview',0))" 2>/dev/null || echo "0")
+            FAILED=$(echo "$RESPONSE" | python3 -c "import sys,json; r=json.load(sys.stdin); print(r.get('summary',{}).get('failed',0))" 2>/dev/null || echo "0")
+            echo "Warning: partial scraper failures — $APPLIED applied, $PENDING pending_review, $FAILED failed"
+          fi
+
+          echo "All scrapers applied successfully"
