@@ -266,7 +266,7 @@ export function HomePageClient({
                           onClick={() => setFechasPhase("final")}
                           className={`rounded-full px-4 py-1.5 font-mono text-xs uppercase tracking-wider ${fechasPhase === "final" ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "text-[color:var(--color-foreground)]/60"}`}
                         >
-                          Gran Final
+                          Final
                         </button>
                       )}
                     </div>
@@ -288,7 +288,7 @@ export function HomePageClient({
                   <>
                     {cuadrangularMatchdays.length === 0 ? (
                       <div className="rounded-2xl border border-dashed border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/10 p-8 text-center">
-                        <p className="font-mono text-sm text-[color:var(--color-foreground)]/60">Cuadrangulares por iniciar — los 4 partidos de la Fecha 1 están en Próximos</p>
+                        <p className="font-mono text-sm text-[color:var(--color-foreground)]/60">Cuadrangulares por iniciar</p>
                         <a href="/cuadrangulares" className="mt-2 inline-block font-mono text-xs text-[color:var(--color-primary)] hover:underline">Ver grupos y estado →</a>
                       </div>
                     ) : (
