@@ -3,6 +3,7 @@
 import { TeamShield } from "@/components/liga/team-shield";
 import { TeamStats } from "@/components/liga/team-stats";
 import { SiteHeader, type TeamInfo } from "@/components/liga/site-header";
+import { ChampionConfetti } from "@/components/liga/champion-confetti";
 import { CalendarDays, ExternalLink, MapPin } from "lucide-react";
 import { formatMatchDate } from "@/lib/format-date";
 
@@ -94,6 +95,7 @@ export function TeamPageClient({
   return (
     <main className="min-h-screen overflow-x-hidden bg-[color:var(--color-background)] text-[color:var(--color-foreground)] selection:bg-[color:var(--color-primary)]/30">
       <SiteHeader teams={teams} />
+      {isChampion && <ChampionConfetti />}
       <div className="mx-auto max-w-7xl space-y-6 px-4 pb-10 pt-24 md:px-8 md:pt-20">
         <section className="overflow-hidden rounded-2xl border border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/20 shadow-sm" aria-labelledby="team-title">
           <div className="grid md:grid-cols-[12rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)]">

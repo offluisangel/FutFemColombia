@@ -183,6 +183,13 @@ export function SiteHeader({ teams }: { teams: TeamInfo[] }) {
             </div>
           </div>
         </div>
+
+        <Link
+          href="/cuadrangulares"
+          className="flex items-center gap-1 bg-[color:var(--color-primary)]/10 border border-[color:var(--color-primary)]/20 text-[color:var(--color-primary)] rounded-full px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider font-semibold shrink-0"
+        >
+          <Trophy size={18} />
+        </Link>
       </div>
 
       {/* Mobile */}
@@ -204,15 +211,14 @@ export function SiteHeader({ teams }: { teams: TeamInfo[] }) {
               className="h-8 w-8 rounded-full"
             />
             <span className="font-serif text-lg font-bold uppercase tracking-tight">
-              Liga F
+              Liga Femenina
             </span>
           </div>
           <Link
             href="/cuadrangulares"
             className="flex items-center gap-1 bg-[color:var(--color-primary)]/10 border border-[color:var(--color-primary)]/20 text-[color:var(--color-primary)] rounded-full px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider font-semibold"
           >
-            <Trophy size={8} />
-            Cuadrangulares
+            <Trophy size={18} />
           </Link>
         </div>
         <div ref={scrollRef} className="shields-scroll pb-1">
