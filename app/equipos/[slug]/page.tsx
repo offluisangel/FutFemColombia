@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { generateTeamDescription } from "@/lib/generate-team-description"
 import { SITE_URL } from "@/lib/constants"
 import { TeamPageClient } from "@/components/liga/team-page-client"
+import { SiteFooter } from "@/components/liga/site-footer"
 import { getBracket, getFinalStageStatus, getStageStandings } from "@/lib/liga/cuadrangulares-data"
 
 export const dynamic = "force-dynamic"
@@ -296,7 +297,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         upcomingMatches={upcomingMatches}
         competitionStatus={competitionStatus}
         shieldUrl={team.shield_url || ""}
-      />
+      >
+        <SiteFooter />
+      </TeamPageClient>
     </>
   )
 }

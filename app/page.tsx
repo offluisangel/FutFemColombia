@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/constants"
 import { HomePageClient } from "@/components/liga/home-page-client"
+import { SiteFooter } from "@/components/liga/site-footer"
 import type { TeamInfo } from "@/components/liga/site-header"
 import type { Scorer } from "@/components/liga/scorers-table"
 import { buildPhotoUrl } from "@/lib/dimayor-ajax"
@@ -308,7 +309,9 @@ export default async function Page() {
         knockoutUpcoming={knockoutUpcoming}
         finalStageActive={["groups_running", "semifinals_running", "final_running"].includes(finalStageStatusRes.status)}
         finalStageStatus={finalStageStatusRes.status}
-      />
+      >
+        <SiteFooter />
+      </HomePageClient>
     </>
   )
 }

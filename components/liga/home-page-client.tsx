@@ -13,11 +13,8 @@ import {
   Calendar,
   Trophy,
   Clock,
-  Github,
-  Instagram,
-  Youtube,
-  ArrowRight,
   Icon,
+  ArrowRight,
 } from "lucide-react";
 import { soccerBall } from "@lucide/lab";
 
@@ -155,6 +152,7 @@ interface HomePageClientProps {
   knockoutUpcoming?: (UpcomingMatch & { group_name?: string | null; phase_label?: string | null })[];
   finalStageActive?: boolean;
   finalStageStatus?: string | null;
+  children?: React.ReactNode;
 }
 
 type FechasPhase = "regular" | "cuadrangular" | "semifinales" | "final";
@@ -173,6 +171,7 @@ export function HomePageClient({
   knockoutUpcoming = [],
   finalStageActive = false,
   finalStageStatus = null,
+  children,
 }: HomePageClientProps) {
   const [activeTab, setActiveTab] = useState("clasificacion");
   const reduced = useReducedMotion();
@@ -391,43 +390,7 @@ export function HomePageClient({
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-[color:var(--color-border)]/20 py-5 px-4 md:px-8">
-        <div className="container mx-auto flex items-center justify-between gap-4">
-          {/* Izquierda: identidad */}
-          <div className="flex items-center gap-2 shrink-0">
-            <img src="/icon.webp" alt="Liga F" className="h-7 w-7 rounded-full" />
-            <div className="hidden sm:block">
-              <p className="font-serif text-sm font-bold uppercase leading-none">Liga F</p>
-              <p className="font-mono text-[10px] text-[color:var(--color-foreground-muted)] mt-0.5">Fútbol femenino colombiano</p>
-            </div>
-            <p className="sm:hidden font-serif text-sm font-bold uppercase">Liga F</p>
-          </div>
-
-          {/* Centro: enlaces sociales */}
-          <div className="flex gap-1.5">
-            {[
-              { Icon: Github, href: "https://github.com/offluisangel", label: "GitHub" },
-              { Icon: Youtube, href: "https://www.youtube.com/@winsportstv/streams", label: "Youtube" },
-              { Icon: Instagram, href: "https://www.instagram.com/offluisangel", label: "Instagram" },
-            ].map(({ Icon, href, label }, i) => (
-              <a
-                key={i}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 bg-[color:var(--color-muted)]/10 text-[color:var(--color-foreground)] rounded-full hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors"
-                aria-label={label}
-              >
-                <Icon size={16} />
-              </a>
-            ))}
-          </div>
-
-          {/* Derecha: temporada */}
-          <p className="font-mono text-[10px] text-[color:var(--color-foreground-muted)] shrink-0">Temporada 2026</p>
-        </div>
-      </footer>
+      {children}
     </main>
   );
 }

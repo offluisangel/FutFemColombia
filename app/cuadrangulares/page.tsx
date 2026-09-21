@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { SITE_URL } from "@/lib/constants"
 import { CuadrangularesClient } from "@/components/liga/cuadrangulares-client"
+import { SiteFooter } from "@/components/liga/site-footer"
 import { getFinalStageData, type FinalStageStatus } from "@/lib/liga/cuadrangulares-data"
 
 const STATUS_LABEL: Record<FinalStageStatus, string> = {
@@ -104,7 +105,9 @@ export default async function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <CuadrangularesClient teams={teams ?? []} data={data} />
+      <CuadrangularesClient teams={teams ?? []} data={data}>
+        <SiteFooter />
+      </CuadrangularesClient>
     </>
   )
 }

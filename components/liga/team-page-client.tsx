@@ -66,6 +66,7 @@ interface TeamPageClientProps {
   competitionStatus: "active" | "eliminated" | "champion";
   shieldUrl: string;
   teams: TeamInfo[];
+  children?: React.ReactNode;
 }
 
 export function TeamPageClient({
@@ -78,6 +79,7 @@ export function TeamPageClient({
   competitionStatus,
   shieldUrl,
   teams,
+  children,
 }: TeamPageClientProps) {
   const isActive = competitionStatus === "active";
   const isChampion = competitionStatus === "champion";
@@ -350,6 +352,7 @@ export function TeamPageClient({
           </section>
         </section>
       </div>
+      {children}
     </main>
   );
 }
