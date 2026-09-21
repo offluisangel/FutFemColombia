@@ -33,13 +33,19 @@ function PlayerPhoto({ name, src }: { name: string; src: string | null }) {
   );
 }
 
-export function ScorersTable({ scorers }: { scorers: Scorer[] }) {
+export function ScorersTable({
+  scorers,
+  seasonYear = new Date().getFullYear(),
+}: {
+  scorers: Scorer[];
+  seasonYear?: number;
+}) {
   return (
     <div className="min-w-0 overflow-hidden rounded-2xl border border-[color:var(--color-border)]/20 bg-[color:var(--color-card)]/12">
       <div className="border-b border-[color:var(--color-border)]/20 p-6">
         <h2 className="font-serif text-2xl font-bold uppercase md:text-3xl">Goleadoras</h2>
         <p className="mt-2 font-mono text-sm text-[color:var(--color-foreground-muted)]">
-          Top 10 goleadoras de la Liga 2026
+          Top 10 goleadoras de la Liga {seasonYear}
         </p>
       </div>
       {scorers.length === 0 ? (

@@ -8,6 +8,7 @@ import { UpcomingMatches, type UpcomingMatch } from "@/components/liga/upcoming-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiteHeader, type TeamInfo } from "@/components/liga/site-header";
 import { ScorersTable, type Scorer } from "@/components/liga/scorers-table";
+import { buildSeasonLabel, seasonYear } from "@/lib/season";
 
 import {
   Calendar,
@@ -152,6 +153,7 @@ interface HomePageClientProps {
   knockoutUpcoming?: (UpcomingMatch & { group_name?: string | null; phase_label?: string | null })[];
   finalStageActive?: boolean;
   finalStageStatus?: string | null;
+  seasonName?: string | null;
   children?: React.ReactNode;
 }
 
@@ -171,6 +173,7 @@ export function HomePageClient({
   knockoutUpcoming = [],
   finalStageActive = false,
   finalStageStatus = null,
+  seasonName = null,
   children,
 }: HomePageClientProps) {
   const [activeTab, setActiveTab] = useState("clasificacion");
@@ -182,12 +185,13 @@ export function HomePageClient({
   const hasKnockout = knockoutUpcoming.length > 0;
   const isRegularFinished = upcoming.length === 0 && matchdays.length > 0;
   const showFinalBanner = finalStageActive;
+  const seasonYearLabel = seasonYear(seasonName);
   const finalStageHeading =
     finalStageStatus === "final_running"
-      ? "Final 2026"
+      ? `Final ${seasonYearLabel}`
       : finalStageStatus === "semifinals_running"
-        ? "Semifinales 2026"
-        : "Cuadrangulares 2026";
+        ? `Semifinales ${seasonYearLabel}`
+        : `Cuadrangulares ${seasonYearLabel}`;
   const [fechasPhase, setFechasPhase] = useState<FechasPhase>(() =>
     hasGranFinal
       ? "final"
@@ -207,7 +211,7 @@ export function HomePageClient({
         <div className="container mx-auto">
           <div className="flex flex-col items-center text-center mb-6">
             <span className="font-mono text-[color:var(--color-primary)] uppercase text-sm tracking-widest">
-              Temporada 2026
+              {buildSeasonLabel(seasonName)}
             </span>
             <h1 className="font-serif text-4xl md:text-6xl font-black uppercase leading-none mt-1">
               Liga Femenina de
@@ -290,7 +294,7 @@ export function HomePageClient({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
               >
-                <ScorersTable scorers={scorers} />
+                <ScorersTable scorers={scorers} seasonYear={seasonYearLabel} />
               </motion.div>
             </TabsContent>
 
@@ -372,17 +376,17 @@ export function HomePageClient({
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-[color:var(--color-primary)] px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-[color:var(--color-primary-foreground)]">{knockoutUpcoming[0]?.phase_label ?? "Eliminatorias"}</span>
                     </div>
-                    <UpcomingMatches upcoming={knockoutUpcoming} nextJornada={knockoutUpcoming[0]?.jornada ?? null} />
+                    <UpcomingMatches upcoming={knockoutUpcoming} nextJornada={knockoutUpcoming[0]?.jornada ?? null} seasonYear={seasonYearLabel} />
                   </>
                 ) : cuadrangularUpcoming.length > 0 ? (
                   <>
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-[color:var(--color-primary)] px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-[color:var(--color-primary-foreground)]">Cuadrangulares</span>
                     </div>
-                    <UpcomingMatches upcoming={cuadrangularUpcoming} nextJornada={cuadrangularUpcoming[0]?.jornada ?? null} />
+                    <UpcomingMatches upcoming={cuadrangularUpcoming} nextJornada={cuadrangularUpcoming[0]?.jornada ?? null} seasonYear={seasonYearLabel} />
                   </>
                 ) : (
-                  <UpcomingMatches upcoming={upcoming} nextJornada={nextJornada} />
+                  <UpcomingMatches upcoming={upcoming} nextJornada={nextJornada} seasonYear={seasonYearLabel} />
                 )}
               </motion.div>
             </TabsContent>

@@ -66,6 +66,7 @@ interface TeamPageClientProps {
   competitionStatus: "active" | "eliminated" | "champion";
   shieldUrl: string;
   teams: TeamInfo[];
+  seasonYear?: number;
   children?: React.ReactNode;
 }
 
@@ -79,12 +80,14 @@ export function TeamPageClient({
   competitionStatus,
   shieldUrl,
   teams,
+  seasonYear,
   children,
 }: TeamPageClientProps) {
+  const year = seasonYear ?? new Date().getFullYear();
   const isActive = competitionStatus === "active";
   const isChampion = competitionStatus === "champion";
   const statusLabel = isChampion
-    ? "Campeón 2026"
+    ? `Campeón ${year}`
     : isActive
       ? "En competencia"
       : "Participación finalizada";
@@ -122,7 +125,7 @@ export function TeamPageClient({
                   {statusLabel}
                 </span>
                 <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-foreground-muted)]">
-                  Liga Femenina 2026
+                  Liga Femenina {year}
                 </span>
               </div>
 
@@ -335,7 +338,7 @@ export function TeamPageClient({
                           <CalendarDays size={13} aria-hidden="true" /> {phaseLabel(match.phase, match.leg, match.jornada)}<span className="sr-only">, </span>{match.fecha && formatMatchDate(match.fecha, match.hora)}
                         </span>
                         <a
-                          href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+2026`}
+                          href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+${year}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors shrink-0"

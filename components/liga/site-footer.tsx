@@ -1,30 +1,15 @@
 import Link from "next/link";
 import { Github, Instagram } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { buildSeasonLabel } from "@/lib/season";
+import { getActiveSeasonName } from "@/lib/get-active-season";
 
 const SOCIAL_LINKS = [
   { Icon: Github, href: "https://github.com/offluisangel", label: "GitHub" },
   { Icon: Instagram, href: "https://www.instagram.com/offluisangel", label: "Instagram" },
 ];
 
-function buildSeasonLabel(name?: string | null): string {
-  if (!name) return `Temporada ${new Date().getFullYear()}`;
-  return name.startsWith("Temporada") ? name : `Temporada ${name}`;
-}
-
 export async function SiteFooter() {
-  let seasonName: string | null = null;
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from("seasons")
-      .select("name")
-      .eq("is_active", true)
-      .maybeSingle();
-    seasonName = data?.name ?? null;
-  } catch {
-    // Si falla la consulta, se cae al año corriente.
-  }
+  const seasonName = await getActiveSeasonName();
 
   return (
     <footer

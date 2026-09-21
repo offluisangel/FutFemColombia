@@ -29,11 +29,12 @@ export function generateTeamDescription(
   team: Standing,
   results: ResultJornada[],
   competitionStatus: "active" | "eliminated" | "champion" = "active",
+  year = new Date().getFullYear(),
 ): string {
   const lines: string[] = [];
 
   lines.push(
-    `${nombreCompleto} disputa la Liga Femenina Colombiana 2026 y se ubica en el ${team.pos}° lugar con ${team.pts} puntos. En ${team.pj} partidos, acumula ${team.pg} victorias, ${team.pe} empates y ${team.pp} derrotas, con ${team.gf} goles a favor, ${team.gc} en contra y una diferencia de ${team.dif > 0 ? "+" : ""}${team.dif}.`,
+    `${nombreCompleto} disputa la Liga Femenina Colombiana ${year} y se ubica en el ${team.pos}° lugar con ${team.pts} puntos. En ${team.pj} partidos, acumula ${team.pg} victorias, ${team.pe} empates y ${team.pp} derrotas, con ${team.gf} goles a favor, ${team.gc} en contra y una diferencia de ${team.dif > 0 ? "+" : ""}${team.dif}.`,
   );
 
   const streak = calculateStreak(team.name, results);
@@ -42,11 +43,11 @@ export function generateTeamDescription(
   }
 
   if (competitionStatus === "champion") {
-    lines.push("Con ese rendimiento, cerró la campaña como campeón de la Liga Femenina Colombiana 2026.");
+    lines.push(`Con ese rendimiento, cerró la campaña como campeón de la Liga Femenina Colombiana ${year}.`);
   } else if (competitionStatus === "active") {
     lines.push("Sigue en competencia esta temporada.");
   } else {
-    lines.push("Su participación en la temporada 2026 ya finalizó, esta es el balance completo de su temporada.");
+    lines.push(`Su participación en la temporada ${year} ya finalizó, esta es el balance completo de su temporada.`);
   }
 
   if (competitionStatus === "active") {

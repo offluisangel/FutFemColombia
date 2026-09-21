@@ -7,52 +7,61 @@ import type { TeamInfo } from "@/components/liga/site-header"
 import type { Scorer } from "@/components/liga/scorers-table"
 import { buildPhotoUrl } from "@/lib/dimayor-ajax"
 import { getFinalStageStatus } from "@/lib/liga/cuadrangulares-data"
+import { seasonYear } from "@/lib/season"
+import { getActiveSeasonName } from "@/lib/get-active-season"
 
 export const dynamic = "force-dynamic"
 
-export const metadata: Metadata = {
-  title: "Liga Femenina de Colombia 2026: Posiciones, Resultados y Goleadoras",
-  description:
-    "Tabla de posiciones, resultados, calendario y goleadoras de la Liga Femenina Colombiana de Fútbol 2026. Sigue la clasificación, los marcadores y las máximas goleadoras de la liga.",
-  alternates: {
-    canonical: SITE_URL,
-  },
-  openGraph: {
-    title: "Liga Femenina de Colombia 2026: Posiciones, Resultados y Goleadoras",
-    description:
-      "Tabla de posiciones, resultados, calendario y goleadoras de la Liga Femenina Colombiana de Fútbol 2026.",
-    url: SITE_URL,
-    images: [
-      {
-        url: `${SITE_URL}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: "Liga Femenina de Colombia 2026",
-      },
-    ],
-    locale: "es_CO",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Liga Femenina de Colombia 2026: Posiciones, Resultados y Goleadoras",
-    description:
-      "Tabla de posiciones, resultados, calendario y goleadoras de la Liga Femenina Colombiana de Fútbol 2026.",
-    images: [{ url: `${SITE_URL}/og-image.png`, alt: "Liga Femenina de Colombia 2026" }],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const year = seasonYear(await getActiveSeasonName())
+  const title = `Liga Femenina de Colombia ${year}: Posiciones, Resultados y Goleadoras`
+  const description =
+    `Tabla de posiciones, resultados, calendario y goleadoras de la Liga Femenina Colombiana de Fútbol ${year}. Sigue la clasificación, los marcadores y las máximas goleadoras de la liga.`
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: SITE_URL,
+    },
+    openGraph: {
+      title,
+      description,
+      url: SITE_URL,
+      siteName: "Liga Femenina Colombia",
+      images: [
+        {
+          url: `${SITE_URL}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `Liga Femenina de Colombia ${year}`,
+        },
+      ],
+      locale: "es_CO",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [{ url: `${SITE_URL}/og-image.png`, alt: `Liga Femenina de Colombia ${year}` }],
+    },
+  }
 }
 
 export default async function Page() {
   const supabase = await createClient()
 
-  const [teamsRes, standingsRes, matchesRes, scorersRes, finalStageStatusRes] = await Promise.all([
+  const [teamsRes, standingsRes, matchesRes, scorersRes, finalStageStatusRes, seasonName] = await Promise.all([
     supabase.from("teams").select("id, name, slug, shield_url"),
     supabase.from("standings").select("*").order("pos", { ascending: true }),
     supabase.from("matches").select("*").order("match_date", { ascending: true }),
     supabase.from("scorers").select("pos, player_id, name, team_name, goals, photo_uuid").order("goals", { ascending: false }).order("pos", { ascending: true }).limit(10),
     getFinalStageStatus(),
+    getActiveSeasonName(),
   ])
 
+  const year = seasonYear(seasonName)
   const teams = (teamsRes.data ?? []) as TeamInfo[]
   const scorers = (scorersRes.data ?? []).map((row): Scorer => ({
     pos: row.pos,
@@ -210,7 +219,7 @@ export default async function Page() {
     "@type": "ListItem",
     position: scorer.pos,
     name: scorer.name,
-    description: `${scorer.goals} goles para ${scorer.team_name} en la Liga F 2026.`,
+    description: `${scorer.goals} goles para ${scorer.team_name} en la Liga F ${year}.`,
   }))
 
   const eventLd = (
@@ -223,7 +232,7 @@ export default async function Page() {
       name: `${m.local} vs ${m.visitante}`,
       startDate: m.hora ? `${m.fecha}T${m.hora}:00` : m.fecha,
       eventStatus: "https://schema.org/EventScheduled",
-      description: `Partido ${roundLabel} de la Liga Femenina Colombiana 2026 entre ${m.local} y ${m.visitante}.`,
+      description: `Partido ${roundLabel} de la Liga Femenina Colombiana ${year} entre ${m.local} y ${m.visitante}.`,
       organizer: {
         "@type": "SportsOrganization",
         name: "Liga Femenina de Colombia",
@@ -248,7 +257,7 @@ export default async function Page() {
         "@type": "WebSite",
         name: "Liga Femenina de Colombia",
         url: SITE_URL,
-        description: "Tabla de posiciones, resultados, calendario y goleadoras de la Liga Femenina Colombiana de Fútbol 2026.",
+        description: "Tabla de posiciones, resultados, calendario y goleadoras de la Liga Femenina Colombiana de Fútbol " + year + ".",
         inLanguage: "es-CO",
       },
       {
@@ -280,7 +289,7 @@ export default async function Page() {
       },
       {
         "@type": "ItemList",
-        name: "Goleadoras de la Liga F 2026",
+        name: `Goleadoras de la Liga F ${year}`,
         itemListElement: scorersLd,
       },
       ...upcomingLd,
@@ -309,6 +318,7 @@ export default async function Page() {
         knockoutUpcoming={knockoutUpcoming}
         finalStageActive={["groups_running", "semifinals_running", "final_running"].includes(finalStageStatusRes.status)}
         finalStageStatus={finalStageStatusRes.status}
+        seasonName={seasonName}
       >
         <SiteFooter />
       </HomePageClient>

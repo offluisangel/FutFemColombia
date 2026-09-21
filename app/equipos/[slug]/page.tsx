@@ -6,6 +6,8 @@ import { SITE_URL } from "@/lib/constants"
 import { TeamPageClient } from "@/components/liga/team-page-client"
 import { SiteFooter } from "@/components/liga/site-footer"
 import { getBracket, getFinalStageStatus, getStageStandings } from "@/lib/liga/cuadrangulares-data"
+import { seasonYear } from "@/lib/season"
+import { getActiveSeasonName } from "@/lib/get-active-season"
 
 export const dynamic = "force-dynamic"
 
@@ -131,17 +133,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!team) return {}
 
   const competitionStatus = await getTeamCompetitionStatus(team.id)
+  const year = seasonYear(await getActiveSeasonName())
 
   const title = competitionStatus === "champion"
-    ? `${team.full_name}: Campeón Liga Femenina 2026 — campaña y resultados`
+    ? `${team.full_name}: Campeón Liga Femenina ${year} — campaña y resultados`
     : competitionStatus === "active"
-      ? `${team.full_name}: Posiciones, resultados y próximos partidos 2026`
-      : `${team.full_name}: Resumen de temporada y resultados 2026`
+      ? `${team.full_name}: Posiciones, resultados y próximos partidos ${year}`
+      : `${team.full_name}: Resumen de temporada y resultados ${year}`
   const description = competitionStatus === "champion"
-    ? `${team.full_name} se coronó campeón de la Liga Femenina Colombiana 2026. Consulta su campaña completa: posición, resultados, estadísticas y partidos clave del título.`
+    ? `${team.full_name} se coronó campeón de la Liga Femenina Colombiana ${year}. Consulta su campaña completa: posición, resultados, estadísticas y partidos clave del título.`
     : competitionStatus === "active"
-      ? `Consulta la posición, resultados, calendario y estadísticas de ${team.full_name} en la Liga Femenina Colombiana 2026. Sigue la tabla de posiciones, los últimos resultados y los próximos partidos.`
-      : `Revisa la campaña completa de ${team.full_name} en la Liga Femenina Colombiana 2026: posición final, resultados, estadísticas y balance de temporada.`
+      ? `Consulta la posición, resultados, calendario y estadísticas de ${team.full_name} en la Liga Femenina Colombiana ${year}. Sigue la tabla de posiciones, los últimos resultados y los próximos partidos.`
+      : `Revisa la campaña completa de ${team.full_name} en la Liga Femenina Colombiana ${year}: posición final, resultados, estadísticas y balance de temporada.`
 
   return {
     title,
@@ -178,6 +181,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (!team) notFound()
 
   const supabase = await createClient()
+  const year = seasonYear(await getActiveSeasonName())
 
   const [teamsRes, standingsRes, allMatchesRes] = await Promise.all([
     supabase.from("teams").select("id, name, slug, shield_url"),
@@ -259,7 +263,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   }
   const resultsForDesc = Array.from(jornadaGroups.values())
 
-  const description = generateTeamDescription(team.full_name, standing, resultsForDesc, competitionStatus)
+  const description = generateTeamDescription(team.full_name, standing, resultsForDesc, competitionStatus, year)
   const teams = dbTeams
 
   return (
@@ -297,6 +301,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         upcomingMatches={upcomingMatches}
         competitionStatus={competitionStatus}
         shieldUrl={team.shield_url || ""}
+        seasonYear={year}
       >
         <SiteFooter />
       </TeamPageClient>
