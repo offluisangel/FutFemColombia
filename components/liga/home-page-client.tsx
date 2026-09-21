@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { StandingsTable, type TeamStanding } from "@/components/liga/standings-table";
 import { MatchCalendar, type Matchday } from "@/components/liga/match-calendar";
@@ -17,7 +17,9 @@ import {
   Instagram,
   Youtube,
   ArrowRight,
+  Icon,
 } from "lucide-react";
+import { soccerBall } from "@lucide/lab";
 
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -32,6 +34,82 @@ function useReducedMotion() {
     subscribeReducedMotion,
     () => window.matchMedia(REDUCED_QUERY).matches,
     () => false,
+  );
+}
+
+// Píldora de tab con indicador deslizante (layoutId) sobre track hundido.
+// "reduced" desactiva el deslizamiento: el indicador aparece instantáneo.
+function TabPill({
+  value,
+  active,
+  reduced,
+  children,
+}: {
+  value: string;
+  active: boolean;
+  reduced: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <TabsTrigger
+      value={value}
+      className={`relative rounded-full px-3 md:px-6 py-1.5 md:py-2 font-mono text-xs md:text-sm uppercase flex items-center transition-[color,transform] duration-150 active:scale-[0.97] motion-reduce:active:scale-100 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)] ${
+        active
+          ? "text-[color:var(--color-primary-foreground)] dark:text-[color:var(--color-primary-foreground)]"
+          : "text-[color:var(--color-foreground)]/60 dark:text-[color:var(--color-foreground)]/60 hover:text-[color:var(--color-foreground)]/90 dark:hover:text-[color:var(--color-foreground)]/90"
+      }`}
+    >
+      {active && !reduced && (
+        <motion.span
+          layoutId="tab-active-indicator"
+          className="absolute inset-0 rounded-full bg-[color:var(--color-primary)] shadow-[0_0_0_1px_rgba(243,113,226,0.25),0_4px_18px_-2px_rgba(243,113,226,0.5)]"
+          transition={{ type: "spring", stiffness: 440, damping: 34, mass: 0.9 }}
+        />
+      )}
+      {active && reduced && (
+        <span className="absolute inset-0 rounded-full bg-[color:var(--color-primary)] shadow-[0_0_0_1px_rgba(243,113,226,0.25),0_4px_18px_-2px_rgba(243,113,226,0.5)]" />
+      )}
+      <span className="relative z-10 flex items-center gap-1 md:gap-2">{children}</span>
+    </TabsTrigger>
+  );
+}
+
+// Píldora de fase (botón plano) con el mismo tratamiento visual que TabPill:
+// track hundido, pod deslizante con layoutId propio y fallback reduced-motion.
+function PhasePill({
+  active,
+  reduced,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  reduced: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`relative rounded-full px-3 sm:px-4 py-1.5 font-mono text-xs uppercase tracking-wider flex items-center transition-[color,transform] duration-150 active:scale-[0.97] motion-reduce:active:scale-100 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)] ${
+        active
+          ? "text-[color:var(--color-primary-foreground)] dark:text-[color:var(--color-primary-foreground)]"
+          : "text-[color:var(--color-foreground)]/60 dark:text-[color:var(--color-foreground)]/60 hover:text-[color:var(--color-foreground)]/90 dark:hover:text-[color:var(--color-foreground)]/90"
+      }`}
+    >
+      {active && !reduced && (
+        <motion.span
+          layoutId="fechas-active-indicator"
+          className="absolute inset-0 rounded-full bg-[color:var(--color-primary)] shadow-[0_0_0_1px_rgba(243,113,226,0.25),0_4px_18px_-2px_rgba(243,113,226,0.5)]"
+          transition={{ type: "spring", stiffness: 440, damping: 34, mass: 0.9 }}
+        />
+      )}
+      {active && reduced && (
+        <span className="absolute inset-0 rounded-full bg-[color:var(--color-primary)] shadow-[0_0_0_1px_rgba(243,113,226,0.25),0_4px_18px_-2px_rgba(243,113,226,0.5)]" />
+      )}
+      <span className="relative z-10 flex items-center gap-1">{children}</span>
+    </button>
   );
 }
 
@@ -97,6 +175,7 @@ export function HomePageClient({
   finalStageStatus = null,
 }: HomePageClientProps) {
   const [activeTab, setActiveTab] = useState("clasificacion");
+  const reduced = useReducedMotion();
   const hasCuadrangular = cuadrangularMatchdays.length > 0 || cuadrangularUpcoming.length > 0;
   const hasSemifinales = semifinalMatchdays.length > 0;
   const hasGranFinal = finalMatchdays.length > 0;
@@ -172,38 +251,26 @@ export function HomePageClient({
             onValueChange={setActiveTab}
             className="w-full max-w-4xl mx-auto"
           >
-            <TabsList className="w-full md:w-auto bg-[color:var(--color-card)]/12 border border-[color:var(--color-border)]/20 p-1 rounded-full mb-4 flex flex-wrap justify-center gap-1 md:gap-2">
-              <TabsTrigger
-                value="clasificacion"
-                className="data-[state=active]:bg-[color:var(--color-primary)] data-[state=active]:text-[color:var(--color-primary-foreground)] rounded-full px-3 md:px-6 py-1.5 md:py-2 font-mono text-xs md:text-sm uppercase flex items-center gap-1 md:gap-2"
-              >
+            <TabsList className="w-full md:w-auto rounded-full border border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/10 p-1.5 mb-4 flex flex-nowrap justify-center gap-1.5 md:gap-2 overflow-x-auto shadow-[inset_0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)] scrollbar-none">
+              <TabPill value="clasificacion" active={activeTab === "clasificacion"} reduced={reduced}>
                 <Trophy size={14} className="md:w-4 md:h-4" />
                 <span className="hidden sm:inline">Clasificación</span>
                 <span className="sm:hidden">Tabla</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="goleadoras"
-                className="data-[state=active]:bg-[color:var(--color-primary)] data-[state=active]:text-[color:var(--color-primary-foreground)] rounded-full px-3 md:px-6 py-2 md:py-2.5 font-mono text-xs md:text-sm uppercase flex items-center gap-1 md:gap-2"
-              >
-                <Trophy size={14} className="md:w-4 md:h-4" />
-                Goleadoras
-              </TabsTrigger>
-
-              <TabsTrigger
-                value="calendario"
-                className="data-[state=active]:bg-[color:var(--color-primary)] data-[state=active]:text-[color:var(--color-primary-foreground)] rounded-full px-3 md:px-6 py-1.5 md:py-2 font-mono text-xs md:text-sm uppercase flex items-center gap-1 md:gap-2"
-              >
+              </TabPill>
+              <TabPill value="goleadoras" active={activeTab === "goleadoras"} reduced={reduced}>
+                <Icon iconNode={soccerBall} size={14} className="md:w-4 md:h-4" />
+                <span className="hidden sm:inline">Goleadoras</span>
+                <span className="sm:hidden">Goles</span>
+              </TabPill>
+              <TabPill value="calendario" active={activeTab === "calendario"} reduced={reduced}>
                 <Calendar size={14} className="md:w-4 md:h-4" />
                 Fechas
-              </TabsTrigger>
-
-              <TabsTrigger
-                value="proximos"
-                className="data-[state=active]:bg-[color:var(--color-primary)] data-[state=active]:text-[color:var(--color-primary-foreground)] rounded-full px-3 md:px-6 py-1.5 md:py-2 font-mono text-xs md:text-sm uppercase flex items-center gap-1 md:gap-2"
-              >
+              </TabPill>
+              <TabPill value="proximos" active={activeTab === "proximos"} reduced={reduced}>
                 <Clock size={14} className="md:w-4 md:h-4" />
-                Próximos
-              </TabsTrigger>
+                <span className="hidden sm:inline">Próximos</span>
+                <span className="sm:hidden">Próx.</span>
+              </TabPill>
             </TabsList>
 
             <TabsContent value="clasificacion" className="mt-0">
@@ -238,36 +305,26 @@ export function HomePageClient({
               >
                 {hasExtraFechas && (
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-wrap gap-1 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-card)]/12 p-1">
-                      <button
-                        onClick={() => setFechasPhase("regular")}
-                        className={`rounded-full px-4 py-1.5 font-mono text-xs uppercase tracking-wider ${fechasPhase === "regular" ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "text-[color:var(--color-foreground)]/60"}`}
-                      >
+                    <div className="flex flex-nowrap justify-center gap-1.5 md:gap-2 rounded-full border border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/10 p-1.5 overflow-x-auto shadow-[inset_0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)] scrollbar-none">
+                      <PhasePill active={fechasPhase === "regular"} reduced={reduced} onClick={() => setFechasPhase("regular")}>
                         Regular
-                      </button>
+                      </PhasePill>
                       {hasCuadrangular && (
-                        <button
-                          onClick={() => setFechasPhase("cuadrangular")}
-                          className={`rounded-full px-4 py-1.5 font-mono text-xs uppercase tracking-wider ${fechasPhase === "cuadrangular" ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "text-[color:var(--color-foreground)]/60"}`}
-                        >
-                          Cuadrangulares
-                        </button>
+                        <PhasePill active={fechasPhase === "cuadrangular"} reduced={reduced} onClick={() => setFechasPhase("cuadrangular")}>
+                          <span className="hidden sm:inline">Cuadrangulares</span>
+                          <span className="sm:hidden">Cuadra.</span>
+                        </PhasePill>
                       )}
                       {hasSemifinales && (
-                        <button
-                          onClick={() => setFechasPhase("semifinales")}
-                          className={`rounded-full px-4 py-1.5 font-mono text-xs uppercase tracking-wider ${fechasPhase === "semifinales" ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "text-[color:var(--color-foreground)]/60"}`}
-                        >
-                          Semifinales
-                        </button>
+                        <PhasePill active={fechasPhase === "semifinales"} reduced={reduced} onClick={() => setFechasPhase("semifinales")}>
+                          <span className="hidden sm:inline">Semifinales</span>
+                          <span className="sm:hidden">Semis.</span>
+                        </PhasePill>
                       )}
                       {hasGranFinal && (
-                        <button
-                          onClick={() => setFechasPhase("final")}
-                          className={`rounded-full px-4 py-1.5 font-mono text-xs uppercase tracking-wider ${fechasPhase === "final" ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "text-[color:var(--color-foreground)]/60"}`}
-                        >
+                        <PhasePill active={fechasPhase === "final"} reduced={reduced} onClick={() => setFechasPhase("final")}>
                           Final
-                        </button>
+                        </PhasePill>
                       )}
                     </div>
                     <a href="/cuadrangulares" className="font-mono text-xs text-[color:var(--color-primary)] hover:underline hidden sm:block">
