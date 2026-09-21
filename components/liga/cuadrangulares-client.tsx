@@ -345,7 +345,7 @@ export function CuadrangularesClient({ teams, data }: { teams: TeamInfo[]; data:
               </span>
             </h1>
             <p className="font-mono text-sm md:text-base text-[color:var(--color-foreground)]/80">
-              Tabla, resultados y próximos partidos
+              Tabla, resultados y próximos partidos.
             </p>
             {data?.updatedAt && <p className="mt-3 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground)]/45">Última actualización: {formatUpdatedAt(data.updatedAt)}</p>}
           </div>
