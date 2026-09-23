@@ -14,7 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { ADMIN_NAV } from "@/components/admin/admin-nav";
+import { ADMIN_NAV_GROUPS } from "@/components/admin/admin-nav";
 import { UserNav } from "@/components/admin/user-nav";
 
 function isActive(pathname: string, href: string) {
@@ -44,31 +44,42 @@ function SidebarContent({
         </p>
       </Link>
 
-      <nav className="flex-1 space-y-1 p-3">
-        {ADMIN_NAV.map((item) => {
-          const active = isActive(pathname, item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={cn(
-                "group flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors",
-                active
-                  ? "border-[color:var(--color-primary)]/35 bg-[color:var(--color-primary)]/12 text-[color:var(--color-primary)]"
-                  : "border-transparent text-[color:var(--color-foreground)]/70 hover:border-[color:var(--color-border)]/40 hover:bg-[color:var(--color-card)]/45 hover:text-[color:var(--color-foreground)]",
-              )}
-            >
-              <item.icon
-                size={16}
-                className={cn(
-                  active ? "" : "opacity-70 group-hover:opacity-100",
-                )}
-              />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+      <nav className="flex-1 space-y-5 overflow-y-auto p-3" aria-label="Navegación administrativa">
+        {ADMIN_NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            <p className="mb-2 px-3 font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-foreground)]/45">
+              {group.label}
+            </p>
+            <div className="space-y-1">
+              {group.items.map((item) => {
+                const active = isActive(pathname, item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "group flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors",
+                      active
+                        ? "border-[color:var(--color-primary)]/35 bg-[color:var(--color-primary)]/12 text-[color:var(--color-primary)]"
+                        : "border-transparent text-[color:var(--color-foreground)]/70 hover:border-[color:var(--color-border)]/40 hover:bg-[color:var(--color-card)]/45 hover:text-[color:var(--color-foreground)]",
+                    )}
+                  >
+                    <item.icon
+                      size={16}
+                      aria-hidden="true"
+                      className={cn(
+                        active ? "" : "opacity-70 group-hover:opacity-100",
+                      )}
+                    />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       <UserNav />

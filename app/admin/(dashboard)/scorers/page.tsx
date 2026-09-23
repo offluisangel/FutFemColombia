@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { SyncStatusPanel } from "@/components/admin/sync-status-panel";
+import { getSyncArea } from "@/lib/admin/sync-areas";
 import { ScorersTable } from "./scorers-table";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +16,7 @@ export default async function AdminScorers() {
   return (
     <div>
       <AdminPageHeader title="Goleadoras" description="Gestiona las estadísticas individuales por temporada." />
+      <SyncStatusPanel area={getSyncArea("scorers")} />
       <ScorersTable scorers={scorersRes.data ?? []} seasons={seasonsRes.data ?? []} teams={teamsRes.data ?? []} />
     </div>
   );

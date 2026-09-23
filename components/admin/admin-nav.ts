@@ -1,15 +1,14 @@
 import type { LucideIcon } from "lucide-react"
 import {
+  Activity,
   CalendarDays,
   Database,
-  LayoutDashboard,
-
-  Shield,
-  Sparkles,
-  Activity,
-  Medal,
-  Trophy,
   GitBranch,
+  LayoutDashboard,
+  Medal,
+  Shield,
+  Table2,
+  Trophy,
 } from "lucide-react"
 
 export type AdminNavItem = {
@@ -18,14 +17,39 @@ export type AdminNavItem = {
   icon: LucideIcon
 }
 
-export const ADMIN_NAV: AdminNavItem[] = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Partidos", href: "/admin/matches", icon: CalendarDays },
-  { label: "Equipos", href: "/admin/teams", icon: Shield },
-  { label: "Cuadrangulares", href: "/admin/cuadrangulares", icon: Trophy },
-  { label: "Fase final", href: "/admin/fase-final", icon: GitBranch },
-  { label: "Goleadoras", href: "/admin/scorers", icon: Medal },
-  { label: "Temporadas", href: "/admin/seasons", icon: Database },
-  { label: "Scrapers", href: "/admin/scrapers", icon: Sparkles },
-  { label: "Actividad", href: "/admin/activity", icon: Activity },
+export type AdminNavGroup = {
+  label: string
+  items: AdminNavItem[]
+}
+
+export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
+  {
+    label: "Inicio",
+    items: [{ label: "Dashboard", href: "/admin", icon: LayoutDashboard }],
+  },
+  {
+    label: "Competencia",
+    items: [
+      { label: "Posiciones", href: "/admin/standings", icon: Table2 },
+      { label: "Partidos", href: "/admin/matches", icon: CalendarDays },
+      { label: "Goleadoras", href: "/admin/scorers", icon: Medal },
+      { label: "Cuadrangulares", href: "/admin/cuadrangulares", icon: Trophy },
+      { label: "Fase final", href: "/admin/fase-final", icon: GitBranch },
+    ],
+  },
+  {
+    label: "Configuración",
+    items: [
+      { label: "Equipos", href: "/admin/teams", icon: Shield },
+      { label: "Temporadas", href: "/admin/seasons", icon: Database },
+    ],
+  },
+  {
+    label: "Operaciones",
+    items: [{ label: "Actividad", href: "/admin/activity", icon: Activity }],
+  },
 ]
+
+export const ADMIN_NAV: AdminNavItem[] = ADMIN_NAV_GROUPS.flatMap(
+  (group) => group.items,
+)

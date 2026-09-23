@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StageStandingsCrud } from "./stage-standings-crud";
 import { MatchesTable } from "../matches/matches-table";
+import { SyncStatusPanel } from "@/components/admin/sync-status-panel";
+import { getSyncArea } from "@/lib/admin/sync-areas";
 
 export const dynamic = "force-dynamic";
 
@@ -13,5 +15,5 @@ export default async function AdminQuadrangulares() {
     supabase.from("seasons").select("*").order("name", { ascending: false }),
     supabase.from("teams").select("*").order("name"),
   ]);
-  return <div className="space-y-6"><AdminPageHeader title="Cuadrangulares" description="Gestiona grupos, programación, marcadores y llaves de la fase final." /><StageStandingsCrud rows={rows.data ?? []} seasons={seasons.data ?? []} teams={teams.data ?? []} /><MatchesTable matches={matches.data ?? []} seasons={seasons.data ?? []} teams={teams.data ?? []} initialPhase="cuadrangular" /></div>;
+  return <div className="space-y-6"><AdminPageHeader title="Cuadrangulares" description="Gestiona grupos, programación, marcadores y llaves de la fase final." /><SyncStatusPanel area={getSyncArea("cuadrangular")} /><StageStandingsCrud rows={rows.data ?? []} seasons={seasons.data ?? []} teams={teams.data ?? []} /><MatchesTable matches={matches.data ?? []} seasons={seasons.data ?? []} teams={teams.data ?? []} initialPhase="cuadrangular" /></div>;
 }

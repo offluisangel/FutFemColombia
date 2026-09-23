@@ -19,6 +19,8 @@ const STATUS_STYLES: Record<string, string> = {
     "border-[color:var(--color-success)]/30 bg-[color:var(--color-success)]/12 text-[color:var(--color-success)]",
   rejected:
     "border-[color:var(--color-border)]/60 bg-[color:var(--color-muted)]/30 text-[color:var(--color-foreground)]/70",
+  skipped:
+    "border-[color:var(--color-border)]/60 bg-[color:var(--color-muted)]/30 text-[color:var(--color-foreground)]/70",
   failed:
     "border-[color:var(--color-danger)]/30 bg-[color:var(--color-danger)]/12 text-[color:var(--color-danger)]",
 }
@@ -34,6 +36,7 @@ const STATUS_LABELS: Record<string, string> = {
   pending_review: "Pendiente",
   applied: "Aplicado",
   rejected: "Rechazado",
+  skipped: "Solo local",
   failed: "Falló",
 }
 
