@@ -15,6 +15,11 @@ import {
 } from "../lib/save-to-supabase"
 import { fetchScorers } from "../lib/dimayor-ajax"
 import { scrapeCuadrangularMatchesHTML, type CuadrangularFixture } from "../lib/winsports-html"
+import {
+  buildScraperPreview,
+  SCRAPER_CONFIGS,
+  type ScraperId,
+} from "../lib/admin/scrapers"
 
 async function fetchCuadrangularWithFallback(): Promise<CuadrangularFixture[]> {
   let apiFixtures: CuadrangularFixture[] = []
@@ -51,12 +56,57 @@ async function fetchCuadrangularWithFallback(): Promise<CuadrangularFixture[]> {
 }
 
 const SCRAPERS = [
-  { name: "standings", fetch: fetchStandings, save: (d: unknown, s: SupabaseClient) => saveStandingsToSupabase(d as Awaited<ReturnType<typeof fetchStandings>>, s) },
-  { name: "matches", fetch: fetchAllMatchdays, save: (d: unknown, s: SupabaseClient) => saveMatchesToSupabase(d as Awaited<ReturnType<typeof fetchAllMatchdays>>, s, "regular") },
-  { name: "results", fetch: fetchAllMatchdays, save: (d: unknown, s: SupabaseClient) => saveMatchesToSupabase(d as Awaited<ReturnType<typeof fetchAllMatchdays>>, s, "regular") },
-  { name: "cuadrangular", fetch: fetchCuadrangularWithFallback, save: (d: unknown, s: SupabaseClient) => saveCuadrangularFixturesToSupabase(d as CuadrangularFixture[], s) },
-  { name: "scorers", fetch: fetchScorers, save: (d: unknown, s: SupabaseClient) => saveScorersToSupabase(d as Awaited<ReturnType<typeof fetchScorers>>, s) },
+  { name: "standings", scraperId: "standings" as const, fetch: fetchStandings, save: (d: unknown, s: SupabaseClient) => saveStandingsToSupabase(d as Awaited<ReturnType<typeof fetchStandings>>, s) },
+  { name: "matches", scraperId: "matches" as const, fetch: fetchAllMatchdays, save: (d: unknown, s: SupabaseClient) => saveMatchesToSupabase(d as Awaited<ReturnType<typeof fetchAllMatchdays>>, s, "regular") },
+  { name: "results", scraperId: "results" as const, fetch: fetchAllMatchdays, save: (d: unknown, s: SupabaseClient) => saveMatchesToSupabase(d as Awaited<ReturnType<typeof fetchAllMatchdays>>, s, "regular") },
+  { name: "cuadrangular", scraperId: "cuadrangular-matches" as const, fetch: fetchCuadrangularWithFallback, save: (d: unknown, s: SupabaseClient) => saveCuadrangularFixturesToSupabase(d as CuadrangularFixture[], s) },
+  { name: "scorers", scraperId: "scorers" as const, fetch: fetchScorers, save: (d: unknown, s: SupabaseClient) => saveScorersToSupabase(d as Awaited<ReturnType<typeof fetchScorers>>, s) },
 ] as const
+
+async function recordRun({
+  supabase,
+  scraperId,
+  status,
+  startedAt,
+  finishedAt,
+  summary,
+  preview,
+  rawData,
+  errorMessage,
+}: {
+  supabase: SupabaseClient
+  scraperId: ScraperId
+  status: "applied" | "failed"
+  startedAt: Date
+  finishedAt: Date
+  summary: Record<string, unknown>
+  preview?: Awaited<ReturnType<typeof buildScraperPreview>>
+  rawData?: unknown
+  errorMessage?: string
+}) {
+  const { error } = await supabase.from("scraper_runs").insert({
+    scraper: scraperId,
+    status,
+    source_url: SCRAPER_CONFIGS[scraperId].sourceUrl,
+    started_at: startedAt.toISOString(),
+    finished_at: finishedAt.toISOString(),
+    duration_ms: finishedAt.getTime() - startedAt.getTime(),
+    triggered_by: null,
+    summary,
+    ...(preview && rawData !== undefined
+      ? {
+          raw_data: rawData,
+          normalized_data: preview.normalized,
+          diff: preview.diff,
+          warnings: preview.warnings,
+        }
+      : {}),
+    error_message: errorMessage ?? null,
+  })
+  if (error) {
+    throw new Error(`No se pudo registrar el run: ${error.message}`)
+  }
+}
 
 async function main() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -71,19 +121,54 @@ async function main() {
   const results: { scraper: string; ok: boolean; count?: number; error?: string }[] = []
 
   for (const scraper of SCRAPERS) {
+    const startedAt = new Date()
     const label = scraper.name.padEnd(10)
     try {
       console.log(`[${label}] Fetching...`)
       const data = await scraper.fetch()
       console.log(`[${label}] Saving...`)
       await scraper.save(data, supabase)
+      const preview = await buildScraperPreview(scraper.scraperId, data, supabase)
+      const finishedAt = new Date()
+      await recordRun({
+        supabase,
+        scraperId: scraper.scraperId,
+        status: "applied",
+        startedAt,
+        finishedAt,
+        summary: preview.summary,
+        preview,
+        rawData: data,
+      })
       const count = Array.isArray(data) ? data.length : 0
       results.push({ scraper: scraper.name, ok: true, count })
       console.log(`[${label}] OK (${count} items)`)
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
+      const finishedAt = new Date()
       results.push({ scraper: scraper.name, ok: false, error: msg })
       console.error(`[${label}] FAILED: ${msg}`)
+      try {
+        await recordRun({
+          supabase,
+          scraperId: scraper.scraperId,
+          status: "failed",
+          startedAt,
+          finishedAt,
+          summary: {
+            fetched: 0,
+            creates: 0,
+            updates: 0,
+            unchanged: 0,
+            skipped: 0,
+            warnings: 0,
+            errors: 1,
+          },
+          errorMessage: msg,
+        })
+      } catch {
+        // No oculta ningun error si también falla el registro del run.
+      }
     }
   }
 

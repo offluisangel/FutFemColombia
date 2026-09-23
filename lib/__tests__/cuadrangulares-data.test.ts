@@ -70,7 +70,7 @@ function buildClient(tables: { matches?: unknown; seasons?: unknown; teams?: unk
       eq: () => query,
       in: () => query,
       order: () => query,
-      maybeSingle: () => thenable({ data: data.seasons[0] ?? null, error: null }),
+      maybeSingle: () => thenable({ data: (data.seasons as unknown[])[0] ?? null, error: null }),
       then: (resolve: (value: unknown) => unknown, reject: (reason?: unknown) => unknown) =>
         Promise.resolve({ data: data[table], error: null }).then(resolve as never, reject as never),
     }

@@ -5,6 +5,10 @@ import { createClient } from "@supabase/supabase-js"
 import { fetchCuadrangularMatchdays } from "../lib/winsports-api"
 import { scrapeCuadrangularMatchesHTML, type CuadrangularFixture } from "../lib/winsports-html"
 import { saveCuadrangularFixturesToSupabase } from "../lib/save-to-supabase"
+import {
+  buildScraperPreview,
+  SCRAPER_CONFIGS,
+} from "../lib/admin/scrapers"
 
 async function main() {
   // Fixtures cuadrangular 2026 — desde 23 ago la API ya publica F1-F3 (12 partidos).
@@ -65,7 +69,58 @@ async function main() {
     throw new Error("Supabase credentials not found")
   }
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
-  await saveCuadrangularFixturesToSupabase(fixtures, supabase)
+  const startedAt = new Date()
+
+  try {
+    await saveCuadrangularFixturesToSupabase(fixtures, supabase)
+    const preview = await buildScraperPreview("cuadrangular-matches", fixtures, supabase)
+    const finishedAt = new Date()
+
+    const { error } = await supabase.from("scraper_runs").insert({
+      scraper: "cuadrangular-matches",
+      status: "applied",
+      source_url: SCRAPER_CONFIGS["cuadrangular-matches"].sourceUrl,
+      started_at: startedAt.toISOString(),
+      finished_at: finishedAt.toISOString(),
+      duration_ms: finishedAt.getTime() - startedAt.getTime(),
+      triggered_by: null,
+      summary: preview.summary,
+      raw_data: fixtures,
+      normalized_data: preview.normalized,
+      diff: preview.diff,
+      warnings: preview.warnings,
+    })
+    if (error) throw new Error(`No se pudo registrar el run: ${error.message}`)
+
+    console.log(`Cuadrangular fixtures saved to Supabase (run applied, ${fixtures.length} partidos)`)
+  } catch (error) {
+    const finishedAt = new Date()
+    const message = error instanceof Error ? error.message : "Unknown error"
+    try {
+      await supabase.from("scraper_runs").insert({
+        scraper: "cuadrangular-matches",
+        status: "failed",
+        source_url: SCRAPER_CONFIGS["cuadrangular-matches"].sourceUrl,
+        started_at: startedAt.toISOString(),
+        finished_at: finishedAt.toISOString(),
+        duration_ms: finishedAt.getTime() - startedAt.getTime(),
+        triggered_by: null,
+        summary: {
+          fetched: 0,
+          creates: 0,
+          updates: 0,
+          unchanged: 0,
+          skipped: 0,
+          warnings: 0,
+          errors: 1,
+        },
+        error_message: message,
+      })
+    } catch {
+      // No oculta ningun error si también falla el registro del run.
+    }
+    throw error
+  }
 }
 
 function inferGroup(local: string, visitante: string): "A" | "B" {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { isAdminUser } from "@/lib/admin/role";
 
 function getClientIp(request: NextRequest) {
   const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
@@ -85,14 +86,26 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  if (isAdminRoute && !isLoginPage && !isLogoutRoute && !user) {
+  if (isApiAdminRoute && !isAdminUser(user)) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "FORBIDDEN",
+          message: "Sin permisos de administrador",
+        },
+      },
+      { status: 403 },
+    );
+  }
+
+  if (isAdminRoute && !isLoginPage && !isLogoutRoute && !isAdminUser(user)) {
     return redirectWithCookies(
       supabaseResponse,
       new URL("/admin/login", request.url),
     );
   }
 
-  if (isLoginPage && user) {
+  if (isLoginPage && isAdminUser(user)) {
     return redirectWithCookies(
       supabaseResponse,
       new URL("/admin", request.url),

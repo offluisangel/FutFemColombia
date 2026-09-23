@@ -1,6 +1,7 @@
 import type React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isAdminUser } from "@/lib/admin/role";
 import { AdminShell } from "@/components/admin/admin-shell";
 
 export default async function DashboardLayout({
@@ -13,7 +14,7 @@ export default async function DashboardLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (!user || !isAdminUser(user)) {
     redirect("/admin/login");
   }
 

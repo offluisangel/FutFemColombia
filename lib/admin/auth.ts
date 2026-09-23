@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { isAdminUser } from "@/lib/admin/role"
 
 export async function requireAdminUser() {
   const supabase = await createClient()
@@ -18,6 +19,21 @@ export async function requireAdminUser() {
       response: NextResponse.json(
         { error: { code: "UNAUTHORIZED", message: "No autorizado" } },
         { status: 401 },
+      ),
+    }
+  }
+
+  if (!isAdminUser(user)) {
+    return {
+      user,
+      response: NextResponse.json(
+        {
+          error: {
+            code: "FORBIDDEN",
+            message: "Sin permisos de administrador",
+          },
+        },
+        { status: 403 },
       ),
     }
   }
