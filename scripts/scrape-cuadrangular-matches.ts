@@ -4,6 +4,11 @@ config({ path: ".env.local" })
 import { createClient } from "@supabase/supabase-js"
 import { fetchCuadrangularMatchdays } from "../lib/winsports-api"
 import { scrapeCuadrangularMatchesHTML, type CuadrangularFixture } from "../lib/winsports-html"
+import {
+  fetchCuadrangularGroupMap,
+  inferCuadrangularGroup,
+  type CuadrangularGroupMap,
+} from "../lib/cuadrangular-groups"
 import { saveCuadrangularFixturesToSupabase } from "../lib/save-to-supabase"
 import {
   buildScraperPreview,
@@ -22,22 +27,33 @@ async function main() {
 
   let fixtures: CuadrangularFixture[] = []
 
+  let groups: CuadrangularGroupMap = {}
+  try {
+    groups = await fetchCuadrangularGroupMap()
+  } catch (error) {
+    console.warn("Standings de cuadrangular no disponibles; se omitirán partidos sin grupo:", error instanceof Error ? error.message : String(error))
+  }
+
   // 1. Obtener todo lo publicado por la API cuadrangular.
   try {
     const matchdays = await fetchCuadrangularMatchdays()
     if (matchdays.length > 0) {
       fixtures = matchdays.flatMap((md) =>
-        md.partidos.map((p) => ({
-          local: p.local,
-          visitante: p.visitante,
-          fecha: p.fecha ?? "",
-          hora: p.hora,
-          jornada: md.jornada,
-          group_name: inferGroup(p.local, p.visitante),
-          golesLocal: p.golesLocal,
-          golesVisitante: p.golesVisitante,
-          matchStatus: p.matchStatus,
-        })),
+        md.partidos.flatMap((p) => {
+          const group = inferCuadrangularGroup(groups, p.local, p.visitante)
+          if (!group) return []
+          return [{
+            local: p.local,
+            visitante: p.visitante,
+            fecha: p.fecha ?? "",
+            hora: p.hora,
+            jornada: md.jornada,
+            group_name: group,
+            golesLocal: p.golesLocal,
+            golesVisitante: p.golesVisitante,
+            matchStatus: p.matchStatus,
+          }]
+        }),
       )
       console.log(`Cuadrangular fixtures via API: ${fixtures.length} partidos (F1-F${matchdays.length})`)
     }
@@ -47,7 +63,7 @@ async function main() {
 
   // 2. El HTML puede publicar jornadas nuevas antes que la API; combinar ambas fuentes.
   try {
-    const htmlFixtures = await scrapeCuadrangularMatchesHTML()
+    const htmlFixtures = await scrapeCuadrangularMatchesHTML(groups)
     const merged = new Map<string, CuadrangularFixture>()
     for (const fixture of [...fixtures, ...htmlFixtures]) {
       const key = `${fixture.jornada}|${fixture.local}|${fixture.visitante}`
@@ -121,20 +137,6 @@ async function main() {
     }
     throw error
   }
-}
-
-function inferGroup(local: string, visitante: string): "A" | "B" {
-  const map: Record<string, "A" | "B"> = {
-    "Atl. Nacional": "A",
-    "Inter de Bogotá": "A",
-    "Inter Palmira": "A",
-    "Millonarios": "A",
-    "Cali": "B",
-    "América": "B",
-    "Santa Fe": "B",
-    "Orsomarso": "B",
-  }
-  return map[local] ?? map[visitante] ?? "A"
 }
 
 main().catch((error) => {

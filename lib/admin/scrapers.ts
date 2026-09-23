@@ -20,6 +20,11 @@ import {
   scrapeCuadrangularMatchesHTML,
 } from "@/lib/winsports-html";
 import {
+  fetchCuadrangularGroupMap,
+  inferCuadrangularGroup,
+  type CuadrangularGroupMap,
+} from "@/lib/cuadrangular-groups";
+import {
   saveMatchesToSupabase,
   saveResultsToSupabase,
   saveStandingsToSupabase,
@@ -215,7 +220,8 @@ export async function scrapeRaw(scraper: ScraperId) {
   if (scraper === "upcoming-html") return scrapeUpcomingHTML();
   if (scraper === "matches-html") return scrapeAllMatchdaysHTML();
   if (scraper === "stage-standings-html") return scrapeStageStandingsHTML();
-  if (scraper === "cuadrangular-matches-html") return scrapeCuadrangularMatchesHTML();
+  if (scraper === "cuadrangular-matches-html")
+    return scrapeCuadrangularMatchesHTML(await fetchCuadrangularGroupMap());
   return fetchUpcomingWeeks();
 }
 
@@ -241,19 +247,33 @@ export async function applyScraperData(
   }
 
   if (scraper === "cuadrangular-matches" || scraper === "cuadrangular-matches-html") {
-    const asFixture = Array.isArray(rawData) && rawData.length > 0 && "partidos" in (rawData[0] as Record<string, unknown>)
-      ? (rawData as Matchday[]).flatMap((md) => md.partidos.map((p) => ({
-          local: p.local,
-          visitante: p.visitante,
-          fecha: (p.fecha as string) ?? "",
-          hora: p.hora,
-          jornada: md.jornada,
-          group_name: inferCuadrangularGroup(p.local, p.visitante) as "A" | "B",
-          golesLocal: p.golesLocal,
-          golesVisitante: p.golesVisitante,
-          matchStatus: p.matchStatus,
-        })))
-      : (rawData as CuadrangularFixture[]);
+    let asFixture: CuadrangularFixture[];
+    if (Array.isArray(rawData) && rawData.length > 0 && "partidos" in (rawData[0] as Record<string, unknown>)) {
+      const groups = await fetchCuadrangularGroupMap();
+      asFixture = [];
+      for (const md of rawData as Matchday[]) {
+        for (const p of md.partidos) {
+          const group = inferCuadrangularGroup(groups, p.local, p.visitante);
+          if (!group) {
+            console.warn(`Cuadrangular: partido sin grupo clasificable (${p.local} vs ${p.visitante}); se omite`);
+            continue;
+          }
+          asFixture.push({
+            local: p.local,
+            visitante: p.visitante,
+            fecha: (p.fecha as string) ?? "",
+            hora: p.hora,
+            jornada: md.jornada,
+            group_name: group,
+            golesLocal: p.golesLocal,
+            golesVisitante: p.golesVisitante,
+            matchStatus: p.matchStatus,
+          });
+        }
+      }
+    } else {
+      asFixture = rawData as CuadrangularFixture[];
+    }
     await saveCuadrangularFixturesToSupabase(asFixture, supabase);
     return;
   }
@@ -284,20 +304,6 @@ export async function applyScraperData(
     rawData as UpcomingMatch[],
     supabase,
   );
-}
-
-const CUADRANGULAR_MAP: Record<string, "A" | "B"> = {
-  "Atl. Nacional": "A",
-  "Inter de Bogotá": "A",
-  "Inter Palmira": "A",
-  "Millonarios": "A",
-  "Cali": "B",
-  "América": "B",
-  "Santa Fe": "B",
-  "Orsomarso": "B",
-};
-function inferCuadrangularGroup(local: string, visitante: string): string {
-  return CUADRANGULAR_MAP[local] ?? CUADRANGULAR_MAP[visitante] ?? "A";
 }
 
 function diffFields(before: JsonRecord | null | undefined, after: JsonRecord) {
@@ -469,7 +475,22 @@ async function normalizeCuadrangular(
   let list: Array<{ jornada: number; fecha?: string; hora?: string; local: string; visitante: string; group_name?: string; golesLocal?: number; golesVisitante?: number; matchStatus?: string }> = [];
   if (Array.isArray(rawData) && rawData.length > 0 && typeof rawData[0] === "object" && "partidos" in (rawData[0] as Record<string, unknown>)) {
     const mdays = rawData as Matchday[];
-    list = mdays.flatMap((md) => md.partidos.map((p) => ({ jornada: md.jornada, fecha: (p.fecha as string) ?? md.fecha, hora: p.hora, local: p.local, visitante: p.visitante, group_name: CUADRANGULAR_MAP[p.local] ?? CUADRANGULAR_MAP[p.visitante] ?? "A", golesLocal: p.golesLocal, golesVisitante: p.golesVisitante, matchStatus: p.matchStatus })));
+    let groups: CuadrangularGroupMap = {};
+    try {
+      groups = await fetchCuadrangularGroupMap();
+    } catch (error) {
+      warnings.push(`Standings de cuadrangular no disponibles: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    for (const md of mdays) {
+      for (const p of md.partidos) {
+        const group = inferCuadrangularGroup(groups, p.local, p.visitante);
+        if (!group) {
+          warnings.push(`Partido sin grupo clasificable: ${p.local} vs ${p.visitante}`);
+          continue;
+        }
+        list.push({ jornada: md.jornada, fecha: (p.fecha as string) ?? md.fecha, hora: p.hora, local: p.local, visitante: p.visitante, group_name: group, golesLocal: p.golesLocal, golesVisitante: p.golesVisitante, matchStatus: p.matchStatus });
+      }
+    }
   } else {
     list = (rawData as CuadrangularFixture[]).map((r) => ({ jornada: r.jornada, fecha: r.fecha, hora: r.hora, local: r.local, visitante: r.visitante, group_name: r.group_name, golesLocal: r.golesLocal, golesVisitante: r.golesVisitante, matchStatus: r.matchStatus }));
   }

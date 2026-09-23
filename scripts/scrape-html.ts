@@ -10,11 +10,17 @@ import {
   saveMatchesToSupabase,
   saveCuadrangularFixturesToSupabase,
 } from "../lib/save-to-supabase"
+import { fetchCuadrangularGroupMap } from "../lib/cuadrangular-groups"
+
+const fetchCuadrangularHTML = async (): Promise<CuadrangularFixture[]> => {
+  const groups = await fetchCuadrangularGroupMap()
+  return scrapeCuadrangularMatchesHTML(groups)
+}
 
 const SCRAPERS = [
   { name: "standings", fetch: scrapeStandingsHTML, save: (d: unknown, s: SupabaseClient) => saveStandingsToSupabase(d as Awaited<ReturnType<typeof scrapeStandingsHTML>>, s) },
   { name: "results", fetch: scrapeResultsHTML, save: (d: unknown, s: SupabaseClient) => saveMatchesToSupabase(d as Awaited<ReturnType<typeof scrapeResultsHTML>>, s, "regular") },
-  { name: "cuadrangular", fetch: scrapeCuadrangularMatchesHTML, save: (d: unknown, s: SupabaseClient) => saveCuadrangularFixturesToSupabase(d as CuadrangularFixture[], s) },
+  { name: "cuadrangular", fetch: fetchCuadrangularHTML, save: (d: unknown, s: SupabaseClient) => saveCuadrangularFixturesToSupabase(d as CuadrangularFixture[], s) },
 ] as const
 
 async function main() {

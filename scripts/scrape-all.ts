@@ -16,33 +16,47 @@ import {
 import { fetchScorers } from "../lib/dimayor-ajax"
 import { scrapeCuadrangularMatchesHTML, type CuadrangularFixture } from "../lib/winsports-html"
 import {
+  fetchCuadrangularGroupMap,
+  inferCuadrangularGroup,
+} from "../lib/cuadrangular-groups"
+import {
   buildScraperPreview,
   SCRAPER_CONFIGS,
   type ScraperId,
 } from "../lib/admin/scrapers"
 
 async function fetchCuadrangularWithFallback(): Promise<CuadrangularFixture[]> {
+  // El map equipo->grupo sale de la fuente (standings de la fase), no de una lista fija.
+  // Si la fuente no responde, el run falla en voz alta en vez de guardar sin clasificar.
+  const groups = await fetchCuadrangularGroupMap()
+
   let apiFixtures: CuadrangularFixture[] = []
   try {
     const matchdays = await fetchCuadrangularMatchdays()
-    apiFixtures = matchdays.flatMap((matchday) => matchday.partidos.map((match) => ({
-      local: match.local,
-      visitante: match.visitante,
-      fecha: match.fecha ?? "",
-      hora: match.hora,
-      jornada: matchday.jornada,
-      group_name: inferGroup(match.local, match.visitante),
-      golesLocal: match.golesLocal,
-      golesVisitante: match.golesVisitante,
-      matchStatus: match.matchStatus,
-    })))
+    apiFixtures = matchdays.flatMap((matchday) =>
+      matchday.partidos.flatMap((match) => {
+        const group = inferCuadrangularGroup(groups, match.local, match.visitante)
+        if (!group) return []
+        return [{
+          local: match.local,
+          visitante: match.visitante,
+          fecha: match.fecha ?? "",
+          hora: match.hora,
+          jornada: matchday.jornada,
+          group_name: group,
+          golesLocal: match.golesLocal,
+          golesVisitante: match.golesVisitante,
+          matchStatus: match.matchStatus,
+        }]
+      }),
+    )
   } catch (error) {
     console.warn("API cuadrangular no disponible:", error instanceof Error ? error.message : String(error))
   }
 
   let htmlFixtures: CuadrangularFixture[] = []
   try {
-    htmlFixtures = await scrapeCuadrangularMatchesHTML()
+    htmlFixtures = await scrapeCuadrangularMatchesHTML(groups)
   } catch (error) {
     console.warn("HTML cuadrangular no disponible:", error instanceof Error ? error.message : String(error))
   }
@@ -181,25 +195,6 @@ async function main() {
 
   const failed = results.filter((r) => !r.ok)
   if (failed.length > 0) process.exit(1)
-}
-
-function inferGroup(local: string, visitante: string): "A" | "B" {
-  const groups: Record<string, "A" | "B"> = {
-    "Atl. Nacional": "A",
-    "Inter de Bogotá": "A",
-    "Inter Palmira": "A",
-    Millonarios: "A",
-    Cali: "B",
-    América: "B",
-    "Santa Fe": "B",
-    Orsomarso: "B",
-  }
-  const localGroup = groups[local]
-  const awayGroup = groups[visitante]
-  if (!localGroup || localGroup !== awayGroup) {
-    throw new Error(`Partido no válido para cuadrangulares: ${local} vs ${visitante}`)
-  }
-  return localGroup
 }
 
 main().catch((err) => {

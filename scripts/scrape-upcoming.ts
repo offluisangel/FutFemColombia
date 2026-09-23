@@ -5,22 +5,34 @@ import { createClient } from "@supabase/supabase-js"
 import { saveCuadrangularFixturesToSupabase } from "../lib/save-to-supabase"
 import { fetchCuadrangularUpcoming } from "../lib/winsports-api"
 import { scrapeCuadrangularMatchesHTML, type CuadrangularFixture } from "../lib/winsports-html"
+import {
+  fetchCuadrangularGroupMap,
+  inferCuadrangularGroup,
+  type CuadrangularGroupMap,
+} from "../lib/cuadrangular-groups"
 
 async function main() {
+  let groups: CuadrangularGroupMap = {}
+  try {
+    groups = await fetchCuadrangularGroupMap()
+  } catch (error) {
+    console.warn("Standings de cuadrangular no disponibles; se omitirán partidos sin grupo:", error instanceof Error ? error.message : String(error))
+  }
+
   let apiFixtures: CuadrangularFixture[] = []
   try {
     const apiMatches = await fetchCuadrangularUpcoming()
-    apiFixtures = apiMatches.map((match) => ({
-      ...match,
-      group_name: inferGroup(match.local, match.visitante),
-    }))
+    apiFixtures = apiMatches.flatMap((match) => {
+      const group = inferCuadrangularGroup(groups, match.local, match.visitante)
+      return group ? [{ ...match, group_name: group }] : []
+    })
   } catch (error) {
     console.warn("API cuadrangular no disponible:", error instanceof Error ? error.message : String(error))
   }
 
   let htmlFixtures: CuadrangularFixture[] = []
   try {
-    htmlFixtures = await scrapeCuadrangularMatchesHTML()
+    htmlFixtures = await scrapeCuadrangularMatchesHTML(groups)
   } catch (error) {
     console.warn("HTML cuadrangular no disponible:", error instanceof Error ? error.message : String(error))
   }
@@ -52,25 +64,6 @@ function mergeFixtures(...sources: CuadrangularFixture[][]): CuadrangularFixture
     }
   }
   return Array.from(merged.values())
-}
-
-function inferGroup(local: string, visitante: string): "A" | "B" {
-  const groups: Record<string, "A" | "B"> = {
-    "Atl. Nacional": "A",
-    "Inter de Bogotá": "A",
-    "Inter Palmira": "A",
-    Millonarios: "A",
-    Cali: "B",
-    América: "B",
-    "Santa Fe": "B",
-    Orsomarso: "B",
-  }
-  const localGroup = groups[local]
-  const awayGroup = groups[visitante]
-  if (!localGroup || localGroup !== awayGroup) {
-    throw new Error(`Partido no válido para cuadrangulares: ${local} vs ${visitante}`)
-  }
-  return localGroup
 }
 
 if (

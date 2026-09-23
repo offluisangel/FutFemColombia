@@ -428,19 +428,9 @@ export async function saveCuadrangularFixturesToSupabase(
 
   const raw: Record<string, Record<string, unknown>> = {};
   const seen = new Set<string>();
-  const groups: Record<string, "A" | "B"> = {
-    "Atl. Nacional": "A",
-    "Inter de Bogotá": "A",
-    "Inter Palmira": "A",
-    Millonarios: "A",
-    Cali: "B",
-    América: "B",
-    "Santa Fe": "B",
-    Orsomarso: "B",
-  };
   for (const m of fixtures) {
-    if (groups[m.local] !== m.group_name || groups[m.visitante] !== m.group_name) {
-      console.warn(`Skipping ${m.local} vs ${m.visitante} - cruza grupos o no pertenece al cuadrangular`);
+    if (m.group_name !== "A" && m.group_name !== "B") {
+      console.warn(`Skipping ${m.local} vs ${m.visitante} - group_name inválido: ${String(m.group_name)}`);
       continue;
     }
     const localId = teamMap.get(m.local);

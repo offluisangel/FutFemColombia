@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio"
 import type { Standing, Matchday, Match, UpcomingMatch } from "./winsports-api"
+import type { CuadrangularGroupMap } from "./cuadrangular-groups"
 
 const BASE = "https://www.winsports.co"
 const POSICIONES = `${BASE}/futbol-colombiano/liga-femenina/posiciones`
@@ -258,39 +259,36 @@ export type CuadrangularFixture = UpcomingMatch & {
   matchStatus?: string
 }
 
-const CUADRANGULAR_TEAMS: Record<string, "A" | "B"> = {
-  "Atl. Nacional": "A",
-  "Inter de Bogotá": "A",
-  "Inter Palmira": "A",
-  "Millonarios": "A",
-  "Cali": "B",
-  "América": "B",
-  "Santa Fe": "B",
-  "Orsomarso": "B",
-}
-
-function inferGroup(local: string, visitante: string): "A" | "B" | null {
-  const a = CUADRANGULAR_TEAMS[local]
-  const b = CUADRANGULAR_TEAMS[visitante]
-  if (a && a === b) return a
-  return a ?? b ?? null
-}
-
-export async function scrapeCuadrangularMatchesHTML(): Promise<CuadrangularFixture[]> {
+export async function scrapeCuadrangularMatchesHTML(
+  groups: CuadrangularGroupMap,
+): Promise<CuadrangularFixture[]> {
   // Mientras Win no publique fixtures en /partidos, esta función retorna [].
   // Cuando Win migre /partidos a <matches-competition> con el stage cuadrangular,
   // el scraper reutiliza scrapeMatchCards y enriquece con group_name.
   const cards = await scrapeMatchCards(PARTIDOS)
   if (cards.length === 0) return []
-  return cards.map((m) => ({
-    local: m.local,
-    visitante: m.visitante,
-    fecha: m.fecha,
-    hora: m.hora,
-    jornada: m.jornada,
-    group_name: inferGroup(m.local, m.visitante) ?? "A",
-    golesLocal: m.golesLocal,
-    golesVisitante: m.golesVisitante,
-    matchStatus: m.status,
-  }))
+  const fixtures: CuadrangularFixture[] = []
+  for (const m of cards) {
+    const localGroup = groups[m.local]
+    const group =
+      localGroup && localGroup === groups[m.visitante] ? localGroup : null
+    if (!group) {
+      console.warn(
+        `Cuadrangular HTML: partido sin grupo clasificable (${m.local} vs ${m.visitante}); se omite`,
+      )
+      continue
+    }
+    fixtures.push({
+      local: m.local,
+      visitante: m.visitante,
+      fecha: m.fecha,
+      hora: m.hora,
+      jornada: m.jornada,
+      group_name: group,
+      golesLocal: m.golesLocal,
+      golesVisitante: m.golesVisitante,
+      matchStatus: m.status,
+    })
+  }
+  return fixtures
 }
