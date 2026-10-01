@@ -181,8 +181,8 @@ CREATE INDEX idx_admin_audit_log_entity ON admin_audit_log(entity_type, entity_i
 
 -- ---------------------------------------------------------------------------
 -- 7. ROW LEVEL SECURITY
---    Lectura pública; escritura solo para usuarios autenticados (admin).
--- ---------------------------------------------------------------------------
+-- Public reads are limited to published football data. All writes and
+-- operational tables require app_metadata.role = 'admin'.
 ALTER TABLE teams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE seasons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE matches ENABLE ROW LEVEL SECURITY;
@@ -198,14 +198,40 @@ CREATE POLICY "Public read matches" ON matches FOR SELECT USING (true);
 CREATE POLICY "Public read standings" ON standings FOR SELECT USING (true);
 CREATE POLICY "Public read stage standings" ON stage_standings FOR SELECT USING (true);
 CREATE POLICY "Public read scorers" ON scorers FOR SELECT USING (true);
-CREATE POLICY "Admin read scraper runs" ON scraper_runs FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin read audit log" ON admin_audit_log FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Admin read scraper runs" ON scraper_runs
+  FOR SELECT USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin read audit log" ON admin_audit_log
+  FOR SELECT USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
-CREATE POLICY "Admin write teams" ON teams FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin write seasons" ON seasons FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin write matches" ON matches FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin write standings" ON standings FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin write stage standings" ON stage_standings FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin write scorers" ON scorers FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin write scraper runs" ON scraper_runs FOR ALL USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin write audit log" ON admin_audit_log FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Admin write teams" ON teams
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin write seasons" ON seasons
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin write matches" ON matches
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin write standings" ON standings
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin write stage standings" ON stage_standings
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin write scorers" ON scorers
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin write scraper runs" ON scraper_runs
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin write audit log" ON admin_audit_log
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');

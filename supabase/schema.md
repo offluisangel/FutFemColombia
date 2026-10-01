@@ -14,7 +14,10 @@
 | `admin_audit_log` | Auditoría de acciones del panel admin | Admin |
 
 Todas las tablas tienen **RLS habilitado**: lectura pública (`FOR SELECT USING (true)`) y
-escritura restringida a usuarios autenticados (`auth.role() = 'authenticated'`).
+Todas las tablas tienen **RLS habilitado**. Los datos deportivos tienen lectura pública
+(`FOR SELECT USING (true)`), mientras que las escrituras y tablas operativas requieren
+`app_metadata.role = 'admin'` en el JWT. `user_metadata` no se usa para autorización
+porque el usuario puede modificarlo.
 
 ## Orden de dependencias
 
@@ -126,13 +129,18 @@ Historial y previsualización de scrapers (API y HTML).
 ## RLS
 
 Todas las tablas: lectura pública. Políticas de escritura:
+administrativo del JWT:
 
 ```
-CREATE POLICY "Admin write <tabla>" ON <tabla> FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Admin write <tabla>" ON <tabla>
+  FOR ALL
+  USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 ```
 
-`scraper_runs` y `admin_audit_log` además restringen la **lectura** a usuarios
-autenticados (no son públicas).
+`scraper_runs` y `admin_audit_log` además restringen la **lectura** al mismo rol
+administrativo (no son públicas). La migración `00007_harden_supabase_rls.sql`
+reemplaza las políticas históricas que solo exigían una sesión autenticada.
 
 ## Notas de uso
 
