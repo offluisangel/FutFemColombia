@@ -42,6 +42,15 @@ Win Sports ──▶ Scrapers ──▶ Supabase (Postgres) ──▶ API Routes
 Los datos se actualizan automáticamente todos los días.
 
 ---
+## Arquitectura
+
+<p align="center">
+  <img src="./public/diagrams/arquitectura.svg" alt="Diagrama de arquitectura de FutFemColombia" width="100%" />
+</p>
+
+<p align="center">
+  <a href="https://futfemcolombia.site/diagrams/arquitectura.html">Abrir diagrama</a>
+</p>
 
 ## Stack
 
@@ -74,24 +83,6 @@ Los datos se actualizan automáticamente todos los días.
 - [x] **Auth** — Login de admin protegido con Supabase SSR + middleware.
 - [x] **SEO** — JSON-LD (Schema.org), Open Graph, Twitter Cards, sitemap, robots.txt, PWA manifest.
 - [x] **CI** — Build automático en pull requests.
-
----
-
-## Cómo Contribuir
-
-Todas las contribuciones son bienvenidas.
-
-En este momento, las contribuciones que más me interesan son las relacionadas con el **diseño y la experiencia del sitio**: mejoras de UI/UX, navegación, responsive, accesibilidad y visualización de la información de la liga. También son bienvenidos los cambios en scrapers, datos, rendimiento, documentación y mantenimiento.
-
-### Áreas donde puedes ayudar
-
-- **Diseñar y mejorar el sitio.** Propuestas y PRs que hagan más clara, útil y atractiva la experiencia de consultar resultados, posiciones, calendario y páginas de equipo.
-- **Mantener scrapers.** Si Win Sports cambia su API, los scrapers se rompen. Actualizarlos ayuda a mantener los datos correctos.
-- **Nuevas fuentes de datos.** ¿Encontraste otro sitio con datos de la Liga F? Agregar un scraper nuevo siempre suma.
-- **Frontend.** Accesibilidad, rendimiento y nuevas secciones, además de mejoras visuales.
-- **Documentación.** El README, guías de uso, etc.
-
-Lee [`CONTRIBUTING.md`](./CONTRIBUTING.md) para más detalles.
 
 ---
 
