@@ -27,6 +27,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -128,6 +129,7 @@ export function TeamsTable({ teams: initial }: { teams: Team[] }) {
                 <DialogTitle className="font-serif text-2xl font-bold uppercase">
                   {editing ? "Editar" : "Nuevo"} equipo
                 </DialogTitle>
+                <DialogDescription>Configura el nombre, la ciudad y los datos del equipo.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4">
                 <AdminFormField

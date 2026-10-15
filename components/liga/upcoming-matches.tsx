@@ -3,6 +3,7 @@
 import { Calendar as CalendarIcon, ExternalLink } from "lucide-react";
 import { TeamShield } from "@/components/liga/team-shield";
 import { formatMatchDate } from "@/lib/format-date";
+import { buildMatchYoutubeSearchUrl } from "@/lib/youtube-search";
 
 export interface UpcomingMatch {
   local: string;
@@ -165,7 +166,7 @@ export function UpcomingMatches({
                 {whenText(match)}
               </span>
               <a
-                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+${seasonYear}`}
+                href={buildMatchYoutubeSearchUrl(match.local, match.visitante, seasonYear)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors shrink-0"
@@ -238,7 +239,7 @@ export function UpcomingMatches({
                     </span>
                   </div>
                   <a
-                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+${seasonYear}`}
+                    href={buildMatchYoutubeSearchUrl(match.local, match.visitante, seasonYear)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors shrink-0"
