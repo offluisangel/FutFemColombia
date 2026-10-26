@@ -32,6 +32,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -234,6 +235,7 @@ export function MatchesTable({
                 <DialogTitle className="font-serif text-2xl font-bold uppercase">
                   {editing ? "Editar" : "Nuevo"} partido
                 </DialogTitle>
+                <DialogDescription>Configura temporada, fase, equipos y datos del encuentro.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2">

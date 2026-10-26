@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import {
 } from "@/components/admin/admin-card";
 
 export default function AdminLogin() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -34,7 +36,7 @@ export default function AdminLogin() {
     }
 
     await supabase.auth.getUser();
-    window.location.assign("/admin");
+    router.replace("/admin");
   };
 
   return (

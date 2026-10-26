@@ -3,6 +3,7 @@
 import { Calendar as CalendarIcon, ExternalLink } from "lucide-react";
 import { TeamShield } from "@/components/liga/team-shield";
 import { formatMatchDate } from "@/lib/format-date";
+import { buildMatchYoutubeSearchUrl } from "@/lib/youtube-search";
 
 export interface UpcomingMatch {
   local: string;
@@ -176,6 +177,15 @@ export function UpcomingMatches({
                   Ver
                 </a>
               </div>
+              <a
+                href={buildMatchYoutubeSearchUrl(match.local, match.visitante, seasonYear)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors shrink-0"
+              >
+                <ExternalLink size={10} />
+                Ver
+              </a>
             </div>
           </div>
         ))}
@@ -252,6 +262,15 @@ export function UpcomingMatches({
                       Ver el partido
                     </a>
                   </div>
+                  <a
+                    href={buildMatchYoutubeSearchUrl(match.local, match.visitante, seasonYear)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors shrink-0"
+                  >
+                    <ExternalLink size={12} />
+                    Ver el partido
+                  </a>
                 </div>
               </div>
             </div>

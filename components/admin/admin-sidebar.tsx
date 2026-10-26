@@ -120,7 +120,7 @@ export function AdminSidebar() {
               </Button>
             </SheetTrigger>
             <SheetContent
-              side="left"
+              side="right"
               className="w-[86vw] border-[color:var(--color-border)]/35 bg-[color:var(--color-background)] p-0"
             >
               <SheetHeader className="sr-only">

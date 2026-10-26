@@ -17,6 +17,7 @@ import type { Scorer } from "@/lib/types/supabase";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -54,7 +55,10 @@ export function ScorersTable({ scorers: initial, seasons, teams }: { scorers: Sc
     <AdminCardHeader title="Listado de goleadoras" description="Posición, goles y equipo por temporada." action={<Button className="rounded-full" onClick={() => { reset(); setOpen(true); }}><Plus size={14} /> Nueva goleadora</Button>} />
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
       <DialogContent className="border-[color:var(--color-border)]/40 bg-[color:var(--color-background)] text-[color:var(--color-foreground)]">
-        <DialogHeader><DialogTitle className="font-serif text-2xl font-bold uppercase">{editing ? "Editar" : "Nueva"} goleadora</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle className="font-serif text-2xl font-bold uppercase">{editing ? "Editar" : "Nueva"} goleadora</DialogTitle>
+          <DialogDescription>Registra la jugadora, su temporada, equipo y goles.</DialogDescription>
+        </DialogHeader>
         <div className="grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
             <AdminFormField label="Temporada"><AdminSelect value={form.season_id} onChange={(e) => setForm({ ...form, season_id: e.target.value })}>{seasons.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</AdminSelect></AdminFormField>

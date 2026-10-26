@@ -29,6 +29,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -123,6 +124,7 @@ export function SeasonsTable({ seasons: initial }: { seasons: Season[] }) {
                 <DialogTitle className="font-serif text-2xl font-bold uppercase">
                   {editing ? "Editar" : "Nueva"} temporada
                 </DialogTitle>
+                <DialogDescription>Configura el nombre y si la temporada está activa.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4">
                 <AdminFormField label="Nombre">

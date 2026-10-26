@@ -7,6 +7,7 @@ import { ChampionConfetti } from "@/components/liga/champion-confetti";
 import { CalendarDays, ExternalLink, MapPin } from "lucide-react";
 import { formatMatchDate } from "@/lib/format-date";
 import { CalendarSubscription } from "@/components/liga/calendar-actions";
+import { buildMatchYoutubeSearchUrl } from "@/lib/youtube-search";
 
 interface TeamStanding {
   pos: number;
@@ -355,6 +356,15 @@ export function TeamPageClient({
                             Ver
                           </a>
                         </div>
+                        <a
+                          href={buildMatchYoutubeSearchUrl(match.local, match.visitante, year)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors shrink-0"
+                        >
+                          <ExternalLink size={10} />
+                          Ver
+                        </a>
                       </div>
                     </div>
                   );
