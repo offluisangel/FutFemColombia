@@ -20,6 +20,8 @@ const base: CalendarMatch = {
 describe("serializeCalendar", () => {
   it("uses stable UIDs, Bogota times, escaping, and CRLF", () => {
     const output = serializeCalendar([base], new Date("2026-01-01T00:00:00Z"));
+    expect(output).toContain("X-WR-CALNAME:futfemcolombia");
+    expect(output).toContain("X-WR-CALDESC:Partidos de la Liga Femenina de Colombia");
     expect(output).toContain("UID:123e4567-e89b-12d3-a456-426614174000@futfemcolombia.site");
     expect(output).toContain("DTSTART;TZID=America/Bogota:20260308T143000");
     expect(output).toContain("SUMMARY:Atlético\\, Norte vs Las Valientes");

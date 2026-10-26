@@ -86,6 +86,8 @@ export function serializeCalendar(matches: CalendarMatch[], now = new Date()): s
     "PRODID:-//FutFemColombia//Match Calendar//ES",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
+    "X-WR-CALNAME:futfemcolombia",
+    "X-WR-CALDESC:Partidos de la Liga Femenina de Colombia",
     `X-WR-TIMEZONE:${CALENDAR_TIME_ZONE}`,
   ];
 
