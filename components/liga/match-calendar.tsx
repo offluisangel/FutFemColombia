@@ -70,7 +70,7 @@ export function MatchCalendar({
           </h2>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-3 md:w-auto">
           {subscriptionHref && <CalendarSubscription href={subscriptionHref} />}
           <button
             onClick={() => setCurrentMatchday(Math.max(0, currentMatchday - 1))}

@@ -162,7 +162,7 @@ export function TeamPageClient({
 
         <section className="grid gap-6 md:grid-cols-2" aria-label="Calendario y resultados del equipo">
           <section className="overflow-hidden rounded-2xl border border-[color:var(--color-border)]/30 bg-[color:var(--color-card)]/15" aria-labelledby="recent-results-title">
-            <div className="flex items-end justify-between gap-4 border-b border-[color:var(--color-border)]/25 p-5 md:p-6">
+            <div className="flex flex-col items-start justify-between gap-4 border-b border-[color:var(--color-border)]/25 p-5 sm:flex-row sm:items-end md:p-6">
               <div>
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-primary)]">Últimas jornadas</p>
                 <h2 id="recent-results-title" className="mt-1 font-serif text-2xl font-bold uppercase tracking-[-0.02em]">Resultados recientes</h2>
@@ -278,12 +278,12 @@ export function TeamPageClient({
           </section>
 
           <section className="overflow-hidden rounded-2xl border border-[color:var(--color-border)]/30 bg-[color:var(--color-card)]/15" aria-labelledby="upcoming-matches-title">
-            <div className="flex items-end justify-between gap-4 border-b border-[color:var(--color-border)]/25 p-5 md:p-6">
+            <div className="flex flex-col items-start justify-between gap-4 border-b border-[color:var(--color-border)]/25 p-5 sm:flex-row sm:items-end md:p-6">
               <div className="min-w-0">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-primary)]">Agenda</p>
                 <h2 id="upcoming-matches-title" className="mt-1 font-serif text-2xl font-bold uppercase tracking-[-0.02em]">Próximos partidos</h2>
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-2">
+              <div className="flex max-w-full flex-col items-start gap-2 sm:shrink-0 sm:items-end">
                 <CalendarSubscription href={calendarUrl ?? `/api/calendar/team/${encodeURIComponent(info.slug)}`} />
                 <span className="font-mono text-[11px] text-[color:var(--color-foreground-muted)]">{upcomingMatches.length} programados</span>
               </div>
