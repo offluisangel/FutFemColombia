@@ -6,6 +6,7 @@ import { SiteHeader, type TeamInfo } from "@/components/liga/site-header";
 import { ChampionConfetti } from "@/components/liga/champion-confetti";
 import { CalendarDays, ExternalLink, MapPin } from "lucide-react";
 import { formatMatchDate } from "@/lib/format-date";
+import { CalendarSubscription } from "@/components/liga/calendar-actions";
 import { buildMatchYoutubeSearchUrl } from "@/lib/youtube-search";
 
 interface TeamStanding {
@@ -68,6 +69,7 @@ interface TeamPageClientProps {
   shieldUrl: string;
   teams: TeamInfo[];
   seasonYear?: number;
+  calendarUrl?: string;
   children?: React.ReactNode;
 }
 
@@ -82,6 +84,7 @@ export function TeamPageClient({
   shieldUrl,
   teams,
   seasonYear,
+  calendarUrl,
   children,
 }: TeamPageClientProps) {
   const year = seasonYear ?? new Date().getFullYear();
@@ -276,11 +279,14 @@ export function TeamPageClient({
 
           <section className="overflow-hidden rounded-2xl border border-[color:var(--color-border)]/30 bg-[color:var(--color-card)]/15" aria-labelledby="upcoming-matches-title">
             <div className="flex items-end justify-between gap-4 border-b border-[color:var(--color-border)]/25 p-5 md:p-6">
-              <div>
+              <div className="min-w-0">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-primary)]">Agenda</p>
                 <h2 id="upcoming-matches-title" className="mt-1 font-serif text-2xl font-bold uppercase tracking-[-0.02em]">Próximos partidos</h2>
               </div>
-              <span className="shrink-0 font-mono text-[11px] text-[color:var(--color-foreground-muted)]">{upcomingMatches.length} programados</span>
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                <CalendarSubscription href={calendarUrl ?? `/api/calendar/team/${encodeURIComponent(info.slug)}`} />
+                <span className="font-mono text-[11px] text-[color:var(--color-foreground-muted)]">{upcomingMatches.length} programados</span>
+              </div>
             </div>
             {upcomingMatches.length === 0 ? (
               <div className="p-8 text-center font-mono text-sm leading-6 text-[color:var(--color-foreground-muted)]">
@@ -338,6 +344,18 @@ export function TeamPageClient({
                         <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--color-primary)]">
                           <CalendarDays size={13} aria-hidden="true" /> {phaseLabel(match.phase, match.leg, match.jornada)}<span className="sr-only">, </span>{match.fecha && formatMatchDate(match.fecha, match.hora)}
                         </span>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <a
+                            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+${year}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Buscar transmisión: ${match.local} vs ${match.visitante}`}
+                            className="inline-flex items-center gap-1 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)]"
+                          >
+                            <ExternalLink size={10} aria-hidden="true" />
+                            Ver
+                          </a>
+                        </div>
                         <a
                           href={buildMatchYoutubeSearchUrl(match.local, match.visitante, year)}
                           target="_blank"

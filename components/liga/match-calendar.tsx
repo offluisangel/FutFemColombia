@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { TeamShield } from "@/components/liga/team-shield";
+import { CalendarSubscription } from "@/components/liga/calendar-actions";
 import { formatMatchDate } from "@/lib/format-date";
 
 interface Match {
@@ -24,7 +25,15 @@ export interface Matchday {
   partidos: Match[];
 }
 
-export function MatchCalendar({ matchdays, phaseLabel }: { matchdays: Matchday[]; phaseLabel?: string }) {
+export function MatchCalendar({
+  matchdays,
+  phaseLabel,
+  subscriptionHref,
+}: {
+  matchdays: Matchday[];
+  phaseLabel?: string;
+  subscriptionHref?: string;
+}) {
   const paginationRef = useRef<HTMLDivElement>(null);
   const [currentMatchday, setCurrentMatchday] = useState(() => {
     const idx = matchdays.findIndex((md) =>
@@ -53,14 +62,16 @@ export function MatchCalendar({ matchdays, phaseLabel }: { matchdays: Matchday[]
 
   return (
     <div className="bg-[color:var(--color-card)]/12 border border-[color:var(--color-border)]/20 rounded-2xl overflow-hidden">
-       <div className="p-6 border-b border-[color:var(--color-border)]/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
+       <div className="p-5 md:p-6 border-b border-[color:var(--color-border)]/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <Calendar size={20} className="shrink-0 text-[color:var(--color-primary)]" aria-hidden="true" />
           <h2 className="font-serif text-2xl md:text-3xl font-bold uppercase">
             {phaseLabel ? phaseLabel : "Calendario"}
           </h2>
         </div>
 
         <div className="flex items-center gap-4">
+          {subscriptionHref && <CalendarSubscription href={subscriptionHref} />}
           <button
             onClick={() => setCurrentMatchday(Math.max(0, currentMatchday - 1))}
             disabled={currentMatchday === 0}

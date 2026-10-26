@@ -294,6 +294,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         competitionStatus={competitionStatus}
         shieldUrl={team.shield_url || ""}
         seasonYear={year}
+        calendarUrl={`${SITE_URL}/api/calendar/team/${encodeURIComponent(slug)}`}
       >
         <SiteFooter />
       </TeamPageClient>
