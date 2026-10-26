@@ -73,6 +73,7 @@ Los datos se actualizan automáticamente todos los días.
 - [x] **Clasificación** — Tabla de posiciones con estadísticas completas (PJ, PG, PE, PP, GF, GC, DIF, PTS).
 - [x] **Calendario interactivo** — Navegación por jornadas con flechas, muestra resultados de partidos ya jugados y fecha/hora de los próximos.
 - [x] **Próximos partidos** — Vista de la siguiente jornada con detalles.
+- [x] **Suscripción a calendario (iCalendar)** — Feeds `.ics` de la liga y de cada equipo para agregarlos a Google Calendar, Apple Calendar u otra app. Los partidos y resultados se actualizan solos. Incluye un panel para copiar el enlace, adaptado a móvil.
 - [x] **Páginas de equipo** — Vista detallada con resultados recientes y próximos partidos.
 - [x] **Fase Final** — Página de cuadrangulares con estructura del formato real.
 - [x] **Estadísticas generales** — Endpoint con resumen de equipos, partidos jugados y goles totales.
@@ -98,6 +99,8 @@ Endpoints públicos disponibles en `/api/*`:
 | `GET /api/upcoming` | Próximos partidos agendados |
 | `GET /api/teams` | Lista de equipos (nombre, slug, escudo) |
 | `GET /api/stats` | Estadísticas generales (equipos, partidos jugados, goles, jornada actual) |
+| `GET /api/calendar` | Feed iCalendar (`text/calendar`) con los partidos de la temporada activa |
+| `GET /api/calendar/team/[slug]` | Feed iCalendar con los partidos de un equipo |
 
 Ejemplo:
 
@@ -105,13 +108,22 @@ Ejemplo:
 curl https://futfemcolombia.site/api/standings
 ```
 
+### Suscripción a calendarios
+
+Los feeds iCalendar usan la zona horaria `America/Bogota` y se cachean 5 minutos. Para suscribirte:
+
+1. En la web, pulsa **Suscribirse al calendario** (home o página del equipo) y luego **Copiar enlace**.
+2. En tu app de calendario, agrégalo como calendario por suscripción desde URL (en Google Calendar: *Otros calendarios → Desde URL*).
+
+También puedes usar directamente `https://futfemcolombia.site/api/calendar`
+
 ---
 
 ## Estructura del proyecto
 
 ```
 app/
-├── api/              # API Routes (públicas + admin + internas)
+├── api/              # API Routes (públicas + admin + internas; incluye feeds iCalendar en api/calendar)
 ├── admin/            # Panel de administración (protegido con auth)
 ├── auth/             # Callback de autenticación
 ├── equipos/[slug]/   # Páginas de equipo
@@ -125,6 +137,7 @@ components/
 
 hooks/                # Custom hooks (use-mobile, use-toast)
 lib/
+├── calendar.ts       # Construcción y serialización de feeds iCalendar
 ├── admin/            # Lógica de admin (api, auth, audit, scrapers)
 ├── supabase/         # Clientes de Supabase (server, client, admin, middleware)
 ├── validations/      # Schemas de Zod
