@@ -319,6 +319,7 @@ export default async function Page() {
         finalStageActive={["groups_running", "semifinals_running", "final_running"].includes(finalStageStatusRes.status)}
         finalStageStatus={finalStageStatusRes.status}
         seasonName={seasonName}
+        calendarUrl={`${SITE_URL}/api/calendar`}
       >
         <SiteFooter />
       </HomePageClient>

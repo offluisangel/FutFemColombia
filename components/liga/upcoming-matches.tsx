@@ -164,15 +164,18 @@ export function UpcomingMatches({
               <span className="font-mono text-[11px] text-[color:var(--color-foreground-muted)]">
                 {whenText(match)}
               </span>
-              <a
-                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+${seasonYear}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors shrink-0"
-              >
-                <ExternalLink size={10} />
-                Ver
-              </a>
+              <div className="flex shrink-0 items-center gap-2">
+                <a
+                  href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+${seasonYear}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Buscar transmisión: ${match.local} vs ${match.visitante}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)]"
+                >
+                  <ExternalLink size={10} aria-hidden="true" />
+                  Ver
+                </a>
+              </div>
             </div>
           </div>
         ))}
@@ -237,15 +240,18 @@ export function UpcomingMatches({
                       {whenText(match)}
                     </span>
                   </div>
-                  <a
-                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+${seasonYear}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors shrink-0"
-                  >
-                    <ExternalLink size={12} />
-                    Ver el partido
-                  </a>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <a
+                      href={`https://www.youtube.com/results?search_query=${encodeURIComponent(match.local)}+vs+${encodeURIComponent(match.visitante)}+Liga+Femenina+${seasonYear}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Buscar transmisión: ${match.local} vs ${match.visitante}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-border)]/20 bg-[color:var(--color-muted)]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground-muted)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)]"
+                    >
+                      <ExternalLink size={12} aria-hidden="true" />
+                      Ver el partido
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

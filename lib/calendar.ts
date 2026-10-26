@@ -1,4 +1,3 @@
-import { SITE_URL } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 
 export const CALENDAR_TIME_ZONE = "America/Bogota";
@@ -114,7 +113,6 @@ export function serializeCalendar(matches: CalendarMatch[], now = new Date()): s
         : `DTEND;VALUE=DATE:${nextDate(match.matchDate)}`,
       `SUMMARY:${escapeText(summary)}`,
       `DESCRIPTION:${escapeText(description)}`,
-      `URL:${SITE_URL}/api/calendar/match/${encodeURIComponent(match.id)}`,
       `STATUS:${status}`,
       "END:VEVENT",
     );
@@ -179,14 +177,4 @@ export async function getActiveSeasonMatches(teamSlug?: string): Promise<{ match
   const teams = await teamMap(supabase);
   if (teams.error) return { matches: [], error: "No se pudieron consultar los equipos." };
   return { matches: ((data ?? []) as MatchRow[]).map((row) => normalizeMatch(row, teams.map, season.name)) };
-}
-
-export async function getMatch(id: string): Promise<{ match?: CalendarMatch; error?: string }> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("matches").select(MATCH_FIELDS).eq("id", id).maybeSingle();
-  if (error) return { error: "No se pudo consultar el partido." };
-  if (!data) return {};
-  const teams = await teamMap(supabase);
-  if (teams.error) return { error: "No se pudieron consultar los equipos." };
-  return { match: normalizeMatch(data as MatchRow, teams.map) };
 }

@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiteHeader, type TeamInfo } from "@/components/liga/site-header";
 import { ScorersTable, type Scorer } from "@/components/liga/scorers-table";
 import { buildSeasonLabel, seasonYear } from "@/lib/season";
-
 import {
   Calendar,
   Trophy,
@@ -72,8 +71,6 @@ function TabPill({
   );
 }
 
-// Píldora de fase (botón plano) con el mismo tratamiento visual que TabPill:
-// track hundido, pod deslizante con layoutId propio y fallback reduced-motion.
 function PhasePill({
   active,
   reduced,
@@ -154,6 +151,7 @@ interface HomePageClientProps {
   finalStageActive?: boolean;
   finalStageStatus?: string | null;
   seasonName?: string | null;
+  calendarUrl?: string;
   children?: React.ReactNode;
 }
 
@@ -174,6 +172,7 @@ export function HomePageClient({
   finalStageActive = false,
   finalStageStatus = null,
   seasonName = null,
+  calendarUrl = "/api/calendar",
   children,
 }: HomePageClientProps) {
   const [activeTab, setActiveTab] = useState("clasificacion");
@@ -337,7 +336,7 @@ export function HomePageClient({
                 )}
                 {fechasPhase === "regular" ? (
                   <>
-                    <MatchCalendar matchdays={matchdays} />
+                    <MatchCalendar matchdays={matchdays} subscriptionHref={calendarUrl} />
                     {hasExtraFechas && (
                       <p className="text-center font-mono text-xs text-[color:var(--color-foreground)]/45">
                         Fase regular finalizada — 16 fechas. <a href="/cuadrangulares" className="text-[color:var(--color-primary)] underline">Ver fase final</a>
@@ -352,13 +351,13 @@ export function HomePageClient({
                         <a href="/cuadrangulares" className="mt-2 inline-block font-mono text-xs text-[color:var(--color-primary)] hover:underline">Ver grupos y estado →</a>
                       </div>
                     ) : (
-                      <MatchCalendar matchdays={cuadrangularMatchdays} phaseLabel="Cuadrangular" />
+                      <MatchCalendar matchdays={cuadrangularMatchdays} phaseLabel="Cuadrangular" subscriptionHref={calendarUrl} />
                     )}
                   </>
                 ) : fechasPhase === "semifinales" ? (
-                  <MatchCalendar matchdays={semifinalMatchdays} phaseLabel="Semifinales" />
+                  <MatchCalendar matchdays={semifinalMatchdays} phaseLabel="Semifinales" subscriptionHref={calendarUrl} />
                 ) : (
-                  <MatchCalendar matchdays={finalMatchdays} phaseLabel="Gran Final" />
+                  <MatchCalendar matchdays={finalMatchdays} phaseLabel="Gran Final" subscriptionHref={calendarUrl} />
                 )}
               </motion.div>
             </TabsContent>
