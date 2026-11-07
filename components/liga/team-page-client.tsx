@@ -8,6 +8,7 @@ import { CalendarDays, ExternalLink, MapPin } from "lucide-react";
 import { formatMatchDate } from "@/lib/format-date";
 import { CalendarSubscription } from "@/components/liga/calendar-actions";
 import { buildMatchYoutubeSearchUrl } from "@/lib/youtube-search";
+import styles from "./team-page.module.css";
 
 interface TeamStanding {
   pos: number;
@@ -105,10 +106,10 @@ export function TeamPageClient({
     <main className="min-h-screen overflow-x-hidden bg-[color:var(--color-background)] text-[color:var(--color-foreground)] selection:bg-[color:var(--color-primary)]/30">
       <SiteHeader teams={teams} />
       {isChampion && <ChampionConfetti />}
-      <div className="mx-auto max-w-7xl space-y-6 px-4 pb-10 pt-24 md:px-8 md:pt-20">
-        <section className="overflow-hidden rounded-2xl border border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/20 shadow-sm" aria-labelledby="team-title">
+      <div className={`mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-28 md:px-8 md:pt-20 ${styles.page}`}>
+        <section className={`overflow-hidden rounded-2xl border border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/20 shadow-sm ${styles.hero}`} aria-labelledby="team-title">
           <div className="grid md:grid-cols-[12rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)]">
-            <div className="flex items-center justify-center border-b border-[color:var(--color-border)]/20 bg-[color:var(--color-primary)]/[0.06] px-6 py-6 md:border-b-0 md:border-r md:px-5 md:py-7">
+            <div className={`flex items-center justify-center border-b border-[color:var(--color-border)]/20 bg-[color:var(--color-primary)]/[0.06] px-6 py-6 md:border-b-0 md:border-r md:px-5 md:py-7 ${styles.identity}`}>
               <div className="flex items-center gap-4 text-center md:flex-col">
                 <TeamShield
                   teamName={team.name}
@@ -158,10 +159,12 @@ export function TeamPageClient({
           </div>
         </section>
 
-        <TeamStats team={team} />
+        <div className={styles.stats}>
+          <TeamStats team={team} />
+        </div>
 
-        <section className="grid gap-6 md:grid-cols-2" aria-label="Calendario y resultados del equipo">
-          <section className="overflow-hidden rounded-2xl border border-[color:var(--color-border)]/30 bg-[color:var(--color-card)]/15" aria-labelledby="recent-results-title">
+        <section className={`grid gap-6 md:grid-cols-2 ${styles.matchSections}`} aria-label="Calendario y resultados del equipo">
+          <section className={`overflow-hidden rounded-2xl border border-[color:var(--color-border)]/30 bg-[color:var(--color-card)]/15 ${styles.results}`} aria-labelledby="recent-results-title">
             <div className="flex flex-col items-start justify-between gap-4 border-b border-[color:var(--color-border)]/25 p-5 sm:flex-row sm:items-end md:p-6">
               <div>
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-primary)]">Últimas jornadas</p>
@@ -187,8 +190,8 @@ export function TeamPageClient({
                   const lost = teamScore < opponentScore;
 
                   return (
-                    <div key={`${match.fecha}-${match.local}-${i}`} className="group p-4 transition-colors hover:bg-[color:var(--color-primary)]/5 md:p-5">
-                      <span className="mb-3 flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--color-primary)]">
+                    <div key={`${match.fecha}-${match.local}-${i}`} className={`group p-4 transition-colors hover:bg-[color:var(--color-primary)]/5 md:p-5 ${styles.matchRow}`}>
+                      <span className={`mb-3 flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--color-primary)] ${styles.matchMeta}`}>
                         <CalendarDays size={13} aria-hidden="true" /> {phaseLabel(match.phase, match.leg, match.jornada)}<span className="sr-only">, </span>{match.fecha && formatMatchDate(match.fecha, match.hora)}
                       </span>
                       <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 md:gap-4" aria-label={`${match.local} ${match.golesLocal}, ${match.visitante} ${match.golesVisitante}`}>
@@ -211,7 +214,7 @@ export function TeamPageClient({
                             }
                           />
                         </div>
-                        <div className="flex items-center gap-1.5 md:gap-2">
+                        <div className={`flex items-center gap-1.5 md:gap-2 ${styles.score}`}>
                           <span
                             className={`font-mono text-base md:text-lg font-bold ${
                               isLocal
@@ -277,7 +280,7 @@ export function TeamPageClient({
             )}
           </section>
 
-          <section className="overflow-hidden rounded-2xl border border-[color:var(--color-border)]/30 bg-[color:var(--color-card)]/15" aria-labelledby="upcoming-matches-title">
+          <section className={`overflow-hidden rounded-2xl border border-[color:var(--color-border)]/30 bg-[color:var(--color-card)]/15 ${styles.upcoming}`} aria-labelledby="upcoming-matches-title">
             <div className="flex flex-col items-start justify-between gap-4 border-b border-[color:var(--color-border)]/25 p-5 sm:flex-row sm:items-end md:p-6">
               <div className="min-w-0">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-primary)]">Agenda</p>
@@ -298,8 +301,8 @@ export function TeamPageClient({
                   const isLocal = match.local === team.name;
 
                   return (
-                    <div key={`${match.fecha}-${match.local}-${i}`} className="group p-4 transition-colors hover:bg-[color:var(--color-primary)]/5 md:p-5">
-                      <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 md:gap-4">
+                    <div key={`${match.fecha}-${match.local}-${i}`} className={`group p-4 transition-colors hover:bg-[color:var(--color-primary)]/5 md:p-5 ${styles.matchRow}`}>
+                      <div className={`mb-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 md:gap-4 ${styles.matchup}`}>
                         <div className="flex items-center gap-1.5 md:gap-2 min-w-0 justify-end">
                           <span
                             className={`font-mono text-xs md:text-sm truncate ${
@@ -340,8 +343,8 @@ export function TeamPageClient({
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--color-primary)]">
+                      <div className={`flex items-center justify-between ${styles.fixtureMeta}`}>
+                        <span className={`inline-flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[color:var(--color-primary)] ${styles.matchMeta}`}>
                           <CalendarDays size={13} aria-hidden="true" /> {phaseLabel(match.phase, match.leg, match.jornada)}<span className="sr-only">, </span>{match.fecha && formatMatchDate(match.fecha, match.hora)}
                         </span>
                         <div className="flex shrink-0 items-center gap-2">
