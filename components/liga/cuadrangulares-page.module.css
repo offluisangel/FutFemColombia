@@ -1,0 +1,305 @@
+.page {
+  --quadrangular-surface: var(--lavender-950);
+}
+
+.hero {
+  padding-top: 7rem;
+}
+
+.heroContent {
+  align-items: center;
+  max-width: 64rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.title {
+  max-width: 22ch;
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+.title span {
+  margin-left: 0.18em;
+  white-space: nowrap;
+}
+
+.groupsSection {
+  padding-top: 1rem;
+}
+
+.group {
+  scroll-margin-top: 6rem;
+}
+
+.groupCard,
+.schedule,
+.matchup {
+  border-color: rgb(146 35 134 / 46%);
+  background: var(--quadrangular-surface);
+}
+
+.groupCard h3 {
+  margin-bottom: 1rem;
+  color: var(--lavender-50);
+  font-size: 1.45rem;
+  letter-spacing: -0.025em;
+}
+
+.standings {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow-x: auto;
+}
+
+.standings thead tr {
+  background: transparent;
+}
+
+.standings tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.groupCard > p {
+  text-align: left;
+  color: var(--lavender-200);
+  line-height: 1.6;
+}
+
+.standings th {
+  padding-block: 0.8rem;
+  color: var(--lavender-200);
+}
+
+.standings td {
+  font-variant-numeric: tabular-nums;
+}
+
+.standings tbody tr {
+  min-height: 3.25rem;
+}
+
+.schedule {
+  background: rgb(36 3 32 / 88%);
+}
+
+.schedule > div:first-child {
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgb(146 35 134 / 32%);
+}
+
+.schedule h4 {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.schedule > div:first-child > span,
+.schedule > p {
+  color: var(--lavender-200);
+}
+
+.schedule button {
+  min-height: 2.5rem;
+  border-radius: 0.25rem;
+  outline-offset: 3px;
+}
+
+.schedule button:focus-visible,
+.standings a:focus-visible {
+  outline: 2px solid var(--lavender-400);
+  outline-offset: 3px;
+}
+
+.groupMatch {
+  padding: 1rem 0;
+  border: 0;
+  border-bottom: 1px solid rgb(146 35 134 / 28%);
+  border-radius: 0;
+  background: transparent;
+}
+
+.groupMatch:last-child {
+  border-bottom: 0;
+}
+
+.groupMatch + .groupMatch {
+  margin-top: 0;
+}
+
+.groupMatch > div > div:nth-child(2) {
+  max-width: min(42%, 12rem);
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-align: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+}
+
+.bracketSection {
+  padding-top: 2.5rem;
+  border-top: 1px solid rgb(146 35 134 / 34%);
+  background: rgb(36 3 32 / 25%);
+}
+
+.semifinals {
+  padding: 0 0 1rem;
+}
+
+.final {
+  padding: 1.1rem;
+  border: 1px solid rgb(243 113 226 / 48%);
+  border-radius: 1rem;
+  background: rgb(36 3 32 / 84%);
+}
+
+.finalMatchup {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.finalScoreboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding-block: 0.5rem 1.5rem;
+}
+
+.finalTeam {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--lavender-50);
+  font-weight: 600;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.finalAggregate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.finalScore {
+  color: var(--color-primary);
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.finalScoreLabel {
+  color: var(--lavender-200);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.finalLegs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(146 35 134 / 32%);
+  color: var(--lavender-200);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.finalLeg {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.finalLeg strong {
+  color: var(--lavender-50);
+  white-space: nowrap;
+}
+
+.matchup {
+  min-width: 0;
+  background: rgb(36 3 32 / 82%);
+}
+
+.matchup > div:first-child {
+  min-height: 4rem;
+}
+
+.matchup > div:nth-child(2) {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.matchup > div:nth-child(2) > div {
+  color: var(--lavender-200);
+  font-size: 0.75rem;
+  line-height: 1.75;
+}
+
+.matchup > div:nth-child(2) strong {
+  color: var(--lavender-50);
+  font-variant-numeric: tabular-nums;
+}
+
+.matchup > div:nth-child(2) > .matchupAggregate {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(146 35 134 / 28%);
+  color: var(--color-primary);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.matchup > div:first-child > div {
+  flex: 1 1 40%;
+}
+
+.matchup > div:first-child > div span {
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding-top: 5rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .groupMatch {
+    padding-block: 0.75rem;
+  }
+
+  .groupMatch > div > div:first-child,
+  .groupMatch > div > div:last-child {
+    gap: 0.35rem;
+  }
+
+  .groupMatch > div > div:first-child span,
+  .groupMatch > div > div:last-child span {
+    font-size: 0.75rem;
+  }
+
+  .final {
+    padding: 0.75rem;
+  }
+}
