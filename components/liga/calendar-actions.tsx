@@ -62,7 +62,7 @@ export function CalendarSubscription({
         aria-expanded={isOpen}
         aria-controls={instructionsId}
         aria-label={label}
-        className="inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-full border border-[color:var(--color-primary)]/35 bg-[color:var(--color-primary)]/10 px-3.5 py-2 font-mono text-[10px] font-semibold uppercase tracking-wider text-[color:var(--color-primary)] transition-colors hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)]"
+        className="inline-flex min-h-11 max-w-full shrink items-center gap-1 rounded-full border border-[color:var(--color-primary)]/35 bg-[color:var(--color-primary)]/10 px-2.5 py-2 font-mono text-[9px] font-semibold uppercase tracking-wide whitespace-nowrap text-[color:var(--color-primary)] transition-colors hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)] md:gap-1.5 md:px-3.5 md:text-[10px] md:tracking-wider"
       >
         <CalendarPlus size={13} aria-hidden="true" />
         {label}
