@@ -1,0 +1,128 @@
+.page {
+  --team-surface: var(--lavender-950);
+}
+
+.hero {
+  border-color: rgb(146 35 134 / 48%);
+  background: var(--lavender-950);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
+}
+
+.identity {
+  background: rgb(58 8 53 / 62%);
+}
+
+.hero h1 {
+  max-width: 18ch;
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+}
+
+.stats > div {
+  border-color: rgb(146 35 134 / 45%);
+  background: var(--lavender-950);
+}
+
+.stats > div > div:first-child {
+  padding: 1.15rem 1.5rem;
+  border-color: rgb(146 35 134 / 38%);
+  background: rgb(36 3 32 / 52%);
+}
+
+.stats > div > div:last-child {
+  gap: 1px;
+  background: rgb(146 35 134 / 28%);
+}
+
+.stats > div > div:last-child > div {
+  background: var(--lavender-950);
+  padding-block: 1.1rem;
+}
+
+.results,
+.upcoming {
+  min-width: 0;
+  border-color: rgb(146 35 134 / 45%);
+  background: var(--lavender-950);
+}
+
+.upcoming {
+  background: rgb(36 3 32 / 88%);
+}
+
+.results > div:first-child,
+.upcoming > div:first-child {
+  border-color: rgb(146 35 134 / 45%);
+  background: rgb(36 3 32 / 48%);
+}
+
+.matchRow {
+  min-width: 0;
+  border-color: rgb(146 35 134 / 24%);
+}
+
+.matchRow + .matchRow {
+  border-top-color: rgb(146 35 134 / 32%);
+}
+
+.matchMeta {
+  min-width: 0;
+  flex-wrap: wrap;
+  row-gap: 0.35rem;
+  line-height: 1.5;
+  color: var(--lavender-200);
+}
+
+.score {
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgb(146 35 134 / 42%);
+  border-radius: 0.65rem;
+  background: rgb(36 3 32 / 74%);
+  font-variant-numeric: tabular-nums;
+}
+
+.matchup > div {
+  min-width: 0;
+}
+
+.fixtureMeta {
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.fixtureMeta > div {
+  flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .matchSections > section {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .matchSections > .upcoming {
+    order: -1;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 9vw, 3.5rem);
+  }
+
+  .fixtureMeta {
+    flex-wrap: wrap;
+  }
+
+  .matchMeta {
+    font-size: 9px;
+    letter-spacing: 0.07em;
+  }
+
+  .matchup {
+    gap: 0.4rem;
+  }
+
+  .matchup > div {
+    overflow-wrap: anywhere;
+  }
+}
