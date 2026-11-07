@@ -4,21 +4,66 @@ import { useState, useEffect, useSyncExternalStore, type ReactNode } from "react
 import { motion } from "framer-motion";
 import { StandingsTable, type TeamStanding } from "@/components/liga/standings-table";
 import { MatchCalendar, type Matchday } from "@/components/liga/match-calendar";
-import { UpcomingMatches, type UpcomingMatch } from "@/components/liga/upcoming-matches";
+import type { UpcomingMatch } from "@/components/liga/upcoming-matches";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiteHeader, type TeamInfo } from "@/components/liga/site-header";
 import { ScorersTable, type Scorer } from "@/components/liga/scorers-table";
 import { buildSeasonLabel, seasonYear } from "@/lib/season";
+import { filterHomeMatchdays, selectHomeUpcomingPhase, type HomeCalendarFilter, type HomeUpcomingPhase } from "@/lib/liga/home-calendar-filter";
+import { CalendarSubscription } from "@/components/liga/calendar-actions";
+import { HomeScorerHighlights } from "@/components/liga/home-scorer-highlights";
+import { formatMatchDate } from "@/lib/format-date";
+import { buildMatchYoutubeSearchUrl } from "@/lib/youtube-search";
+import { TeamShield } from "@/components/liga/team-shield";
+import styles from "@/components/liga/home-tabs.module.css";
 import {
   Calendar,
   Trophy,
-  Clock,
   Icon,
   ArrowRight,
 } from "lucide-react";
 import { soccerBall } from "@lucide/lab";
 
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
+
+function OverviewFixtures({
+  upcoming,
+  nextJornada,
+  seasonYear: year,
+}: {
+  upcoming: UpcomingMatch[];
+  nextJornada: number | null;
+  seasonYear: number;
+}) {
+  const matches = upcoming.filter((match) => match.jornada === nextJornada);
+
+  if (matches.length === 0) {
+    return <p className="font-mono text-sm text-[color:var(--color-foreground-muted)]">No hay encuentros próximos disponibles.</p>;
+  }
+
+  return (
+    <ul className="divide-y divide-[color:var(--color-border)]/30">
+      {matches.map((match, index) => (
+        <li key={`${match.jornada}-${match.local}-${match.visitante}-${index}`} className="py-4 first:pt-0 last:pb-0">
+          <p className="mb-3 font-mono text-xs text-[color:var(--color-foreground-muted)]">
+            {formatMatchDate(match.fecha, match.hora)}
+            {match.phase_label ? ` · ${match.phase_label}` : match.group_name ? ` · Grupo ${match.group_name}` : ""}
+          </p>
+          <div className="flex items-center gap-3">
+            <TeamShield teamName={match.local} shieldUrl={match.shield_local} sizeClassName="h-8 w-8" />
+            <span className="min-w-0 flex-1 font-mono text-sm">{match.local}</span>
+            <span className="font-serif text-xs text-[color:var(--color-foreground-muted)]">VS</span>
+            <span className="min-w-0 flex-1 text-right font-mono text-sm">{match.visitante}</span>
+            <TeamShield teamName={match.visitante} shieldUrl={match.shield_away} sizeClassName="h-8 w-8" tone="muted" />
+          </div>
+          <a href={buildMatchYoutubeSearchUrl(match.local, match.visitante, year)} target="_blank" rel="noreferrer" className="mt-3 inline-block font-mono text-xs text-[color:var(--color-primary)] underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]">
+            Buscar transmisión
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function subscribeReducedMotion(onChange: () => void) {
   const mq = window.matchMedia(REDUCED_QUERY);
@@ -136,6 +181,16 @@ function AnimatedCounter({
   return <span className={className}>{reduced ? value : count}</span>;
 }
 
+function CalendarPhase({ matchdays, phaseLabel, subscriptionHref, phaseKey }: { matchdays: Matchday[]; phaseLabel?: string; subscriptionHref: string; phaseKey: string }) {
+  if (matchdays.length === 0) return (
+    <div key={phaseKey} className="rounded-2xl border border-[color:var(--color-border)]/20 bg-[color:var(--color-card)]/12 p-6 text-center">
+      <p className="font-mono text-sm text-[color:var(--color-foreground-muted)]">No hay partidos para este filtro.</p>
+      <div className="mt-4 flex justify-center"><CalendarSubscription href={subscriptionHref} /></div>
+    </div>
+  );
+  return <MatchCalendar key={phaseKey} matchdays={matchdays} phaseLabel={phaseLabel} subscriptionHref={subscriptionHref} />;
+}
+
 interface HomePageClientProps {
   teams: TeamInfo[];
   standings: TeamStanding[];
@@ -155,7 +210,7 @@ interface HomePageClientProps {
   children?: React.ReactNode;
 }
 
-type FechasPhase = "regular" | "cuadrangular" | "semifinales" | "final";
+type FechasPhase = HomeUpcomingPhase;
 
 export function HomePageClient({
   teams,
@@ -175,7 +230,8 @@ export function HomePageClient({
   calendarUrl = "/api/calendar",
   children,
 }: HomePageClientProps) {
-  const [activeTab, setActiveTab] = useState("clasificacion");
+  const [activeTab, setActiveTab] = useState("resumen");
+  const [calendarFilter, setCalendarFilter] = useState<HomeCalendarFilter>("all");
   const reduced = useReducedMotion();
   const hasCuadrangular = cuadrangularMatchdays.length > 0 || cuadrangularUpcoming.length > 0;
   const hasSemifinales = semifinalMatchdays.length > 0;
@@ -205,23 +261,21 @@ export function HomePageClient({
     <main className="flex min-h-screen flex-col overflow-x-hidden bg-[color:var(--color-background)] text-[color:var(--color-foreground)]">
       <SiteHeader teams={teams} />
 
-      {/* Hero Section */}
-      <section className="pt-28 md:pt-20 pb-4 px-4 md:px-8">
-        <div className="container mx-auto">
-          <div className="flex flex-col items-center text-center mb-6">
-            <span className="font-mono text-[color:var(--color-primary)] uppercase text-sm tracking-widest">
-              {buildSeasonLabel(seasonName)}
-            </span>
-            <h1 className="font-serif text-4xl md:text-6xl font-black uppercase leading-none mt-1">
-              Liga Femenina de
-              <span className="block text-[color:var(--color-primary)]">
-                Colombia
-              </span>
-            </h1>
-            <p className="font-mono text-[color:var(--color-foreground-muted)] max-w-2xl text-sm md:text-base mt-3">
-              Sigue el fútbol femenino colombiano. Resultados en vivo,
-              clasificación actualizada y el calendario completo de la liga.
-            </p>
+      <section className="px-4 pt-28 pb-8 md:px-8 md:pt-20" aria-labelledby="page-title">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+            <div>
+              <p className="mb-2 font-mono text-xs text-[color:var(--color-primary)]">{buildSeasonLabel(seasonName)}</p>
+              <h1 id="page-title" className="max-w-3xl font-serif text-4xl font-bold leading-tight tracking-tight">
+                Liga Femenina de <span className="text-[color:var(--color-primary)]">Colombia</span>
+              </h1>
+              <p className="mt-3 max-w-2xl font-mono text-sm text-[color:var(--color-foreground-muted)] md:text-base">
+                Sigue el fútbol femenino colombiano. Resultados en vivo, clasificación actualizada y el calendario completo de la liga.
+              </p>
+            </div>
+            <button type="button" onClick={() => { setActiveTab("calendario"); setCalendarFilter("upcoming"); setFechasPhase(selectHomeUpcomingPhase({ knockoutUpcoming, cuadrangularUpcoming, upcoming, finalMatchdays, semifinalMatchdays, cuadrangularMatchdays, regularMatchdays: matchdays })); }} className="inline-flex w-fit items-center gap-2 rounded-full bg-[color:var(--color-primary)] px-5 py-3 font-mono text-xs font-semibold uppercase text-[color:var(--color-primary-foreground)] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)]">
+              Ver todos los partidos <ArrowRight size={15} aria-hidden="true" />
+            </button>
           </div>
         </div>
       </section>
@@ -251,13 +305,12 @@ export function HomePageClient({
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
-            className="w-full max-w-4xl mx-auto"
+            className="w-full max-w-6xl mx-auto"
           >
             <TabsList className="w-full md:w-auto rounded-full border border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/10 p-1.5 mb-4 flex flex-nowrap justify-center gap-1.5 md:gap-2 overflow-x-auto shadow-[inset_0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)] scrollbar-none">
-              <TabPill value="clasificacion" active={activeTab === "clasificacion"} reduced={reduced}>
+              <TabPill value="resumen" active={activeTab === "resumen"} reduced={reduced}>
                 <Trophy size={14} className="md:w-4 md:h-4" />
-                <span className="hidden sm:inline">Clasificación</span>
-                <span className="sm:hidden">Tabla</span>
+                Resumen
               </TabPill>
               <TabPill value="goleadoras" active={activeTab === "goleadoras"} reduced={reduced}>
                 <Icon iconNode={soccerBall} size={14} className="md:w-4 md:h-4" />
@@ -266,48 +319,75 @@ export function HomePageClient({
               </TabPill>
               <TabPill value="calendario" active={activeTab === "calendario"} reduced={reduced}>
                 <Calendar size={14} className="md:w-4 md:h-4" />
-                Fechas
-              </TabPill>
-              <TabPill value="proximos" active={activeTab === "proximos"} reduced={reduced}>
-                <Clock size={14} className="md:w-4 md:h-4" />
-                <span className="hidden sm:inline">Próximos</span>
-                <span className="sm:hidden">Próx.</span>
+                Calendario
               </TabPill>
             </TabsList>
 
-            <TabsContent value="clasificacion" className="mt-0">
+            <TabsContent value="resumen" className="mt-0">
               <motion.div
-                key={`tab-${activeTab === "clasificacion"}`}
+                key={`tab-${activeTab === "resumen"}`}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
+                className="grid items-start gap-8 lg:grid-cols-[0.9fr_1.1fr]"
               >
-                <StandingsTable teams={standings} />
+                <section id="proximos-partidos" aria-labelledby="upcoming-title" className="order-1 min-w-0 rounded-2xl bg-[var(--lavender-950)] p-5 md:p-6 lg:order-2">
+                  <div className="mb-4 flex items-baseline justify-between gap-3">
+                    <h2 id="upcoming-title" className="font-serif text-2xl font-bold">Próximos partidos</h2>
+                    <button type="button" onClick={() => { setActiveTab("calendario"); setCalendarFilter("all"); }} className="font-mono text-xs text-[color:var(--color-foreground-muted)] underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)]">Ver calendario</button>
+                  </div>
+                  {hasKnockout ? (
+                    <>
+                      <p className="mb-3 font-mono text-xs uppercase text-[color:var(--color-primary)]">{knockoutUpcoming[0]?.phase_label ?? "Eliminatorias"}</p>
+                      <OverviewFixtures upcoming={knockoutUpcoming} nextJornada={knockoutUpcoming[0]?.jornada ?? null} seasonYear={seasonYearLabel} />
+                    </>
+                  ) : cuadrangularUpcoming.length > 0 ? (
+                    <>
+                      <p className="mb-3 font-mono text-xs uppercase text-[color:var(--color-primary)]">Cuadrangulares</p>
+                      <OverviewFixtures upcoming={cuadrangularUpcoming} nextJornada={cuadrangularUpcoming[0]?.jornada ?? null} seasonYear={seasonYearLabel} />
+                    </>
+                  ) : (
+                    <OverviewFixtures upcoming={upcoming} nextJornada={nextJornada} seasonYear={seasonYearLabel} />
+                  )}
+                </section>
+                <section aria-labelledby="classification-title" className="order-2 min-w-0 overflow-x-auto lg:order-1">
+                  <div className="mb-4 flex items-baseline justify-between gap-3">
+                    <h2 id="classification-title" className="font-serif text-2xl font-bold">Clasificación</h2>
+                    <span className="rounded-lg bg-[color:var(--color-card)] px-3 py-1 font-mono text-xs">Regular</span>
+                  </div>
+                  <StandingsTable teams={standings} />
+                </section>
               </motion.div>
             </TabsContent>
 
-            <TabsContent value="goleadoras" className="mt-0">
+            <TabsContent value="goleadoras" className={`mt-0 ${styles.scorers}`}>
               <motion.div
                 key={`tab-${activeTab === "goleadoras"}`}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
               >
+                <HomeScorerHighlights scorers={scorers} />
                 <ScorersTable scorers={scorers} seasonYear={seasonYearLabel} />
               </motion.div>
             </TabsContent>
 
-            <TabsContent value="calendario" className="mt-3 sm:mt-4">
+            <TabsContent value="calendario" className={`mt-3 sm:mt-4 ${styles.calendar}`}>
               <motion.div
-                key={`tab-${activeTab === "calendario"}-${fechasPhase}`}
+                key={`tab-${activeTab === "calendario"}-${fechasPhase}-${calendarFilter}`}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
                 className="space-y-4"
               >
+                <div className={styles.filters} role="group" aria-label="Filtrar partidos">
+                  {([['all', 'Todas'], ['upcoming', 'Próximos'], ['results', 'Resultados']] as const).map(([filter, label]) => (
+                    <button key={filter} type="button" aria-pressed={calendarFilter === filter} onClick={() => setCalendarFilter(filter)} className={`${styles.filterButton} rounded-full px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--color-background)] ${calendarFilter === filter ? "bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]" : "text-[color:var(--color-foreground)]/60 hover:text-[color:var(--color-foreground)]"}`}>{label}</button>
+                  ))}
+                </div>
                 {hasExtraFechas && (
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-nowrap justify-center gap-1.5 md:gap-2 rounded-full border border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/10 p-1.5 overflow-x-auto shadow-[inset_0_2px_8px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.04)] scrollbar-none">
+                  <div className={styles.phaseGroup}>
+                    <div className={styles.phasePills}>
                       <PhasePill active={fechasPhase === "regular"} reduced={reduced} onClick={() => setFechasPhase("regular")}>
                         Regular
                       </PhasePill>
@@ -336,7 +416,7 @@ export function HomePageClient({
                 )}
                 {fechasPhase === "regular" ? (
                   <>
-                    <MatchCalendar matchdays={matchdays} subscriptionHref={calendarUrl} />
+                    <div className={styles.fixtureSurface}><CalendarPhase matchdays={filterHomeMatchdays(matchdays, calendarFilter)} phaseLabel={undefined} subscriptionHref={calendarUrl} phaseKey={`regular-${calendarFilter}`} /></div>
                     {hasExtraFechas && (
                       <p className="text-center font-mono text-xs text-[color:var(--color-foreground)]/45">
                         Fase regular finalizada — 16 fechas. <a href="/cuadrangulares" className="text-[color:var(--color-primary)] underline">Ver fase final</a>
@@ -349,46 +429,20 @@ export function HomePageClient({
                       <div className="rounded-2xl border border-dashed border-[color:var(--color-border)]/25 bg-[color:var(--color-card)]/10 p-8 text-center">
                         <p className="font-mono text-sm text-[color:var(--color-foreground)]/60">Cuadrangulares por iniciar</p>
                         <a href="/cuadrangulares" className="mt-2 inline-block font-mono text-xs text-[color:var(--color-primary)] hover:underline">Ver grupos y estado →</a>
+                        <div className="mt-4 flex justify-center"><CalendarSubscription href={calendarUrl} /></div>
                       </div>
                     ) : (
-                      <MatchCalendar matchdays={cuadrangularMatchdays} phaseLabel="Cuadrangular" subscriptionHref={calendarUrl} />
+                      <div className={styles.fixtureSurface}><CalendarPhase matchdays={filterHomeMatchdays(cuadrangularMatchdays, calendarFilter)} phaseLabel="Cuadrangular" subscriptionHref={calendarUrl} phaseKey={`groups-${calendarFilter}`} /></div>
                     )}
                   </>
                 ) : fechasPhase === "semifinales" ? (
-                  <MatchCalendar matchdays={semifinalMatchdays} phaseLabel="Semifinales" subscriptionHref={calendarUrl} />
+                  <div className={styles.fixtureSurface}><CalendarPhase matchdays={filterHomeMatchdays(semifinalMatchdays, calendarFilter)} phaseLabel="Semifinales" subscriptionHref={calendarUrl} phaseKey={`semis-${calendarFilter}`} /></div>
                 ) : (
-                  <MatchCalendar matchdays={finalMatchdays} phaseLabel="Gran Final" subscriptionHref={calendarUrl} />
+                  <div className={styles.fixtureSurface}><CalendarPhase matchdays={filterHomeMatchdays(finalMatchdays, calendarFilter)} phaseLabel="Gran Final" subscriptionHref={calendarUrl} phaseKey={`final-${calendarFilter}`} /></div>
                 )}
               </motion.div>
             </TabsContent>
 
-            <TabsContent value="proximos" className="mt-3 sm:mt-4">
-              <motion.div
-                key={`tab-${activeTab === "proximos"}`}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-                className="space-y-6"
-              >
-                {hasKnockout ? (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-[color:var(--color-primary)] px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-[color:var(--color-primary-foreground)]">{knockoutUpcoming[0]?.phase_label ?? "Eliminatorias"}</span>
-                    </div>
-                    <UpcomingMatches upcoming={knockoutUpcoming} nextJornada={knockoutUpcoming[0]?.jornada ?? null} seasonYear={seasonYearLabel} />
-                  </>
-                ) : cuadrangularUpcoming.length > 0 ? (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-[color:var(--color-primary)] px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-[color:var(--color-primary-foreground)]">Cuadrangulares</span>
-                    </div>
-                    <UpcomingMatches upcoming={cuadrangularUpcoming} nextJornada={cuadrangularUpcoming[0]?.jornada ?? null} seasonYear={seasonYearLabel} />
-                  </>
-                ) : (
-                  <UpcomingMatches upcoming={upcoming} nextJornada={nextJornada} seasonYear={seasonYearLabel} />
-                )}
-              </motion.div>
-            </TabsContent>
           </Tabs>
         </div>
       </section>

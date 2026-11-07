@@ -1,0 +1,33 @@
+.scorers > div { display: grid; gap: 2rem; }
+.scorers section { margin-bottom: 2.5rem; }
+.scorers section > h2 { margin-bottom: 1rem; font-size: clamp(1.5rem, 3vw, 2rem); }
+.scorers section ol { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.scorers section ol li { border: 1px solid rgb(146 35 134 / 45%); background: var(--lavender-950); padding: 1.25rem; }
+.scorers section ol li:first-child { min-height: 12rem; border-color: rgb(243 113 226 / 55%); background: var(--lavender-800); }
+.scorers section ol li:first-child h3 { color: var(--lavender-50); font-size: clamp(1.65rem, 4vw, 2.5rem); }
+.scorers section ol li:first-child strong { font-size: 2.75rem; }
+.scorers section ol li:nth-child(n+2) { display: flex; flex-direction: column; justify-content: space-between; }
+.scorers > div > div { border-color: rgb(146 35 134 / 45%); background: var(--lavender-950); }
+.scorers > div > div > div:first-child { border-color: rgb(146 35 134 / 45%); padding: 1.25rem 1.5rem; }
+.scorers > div > div th { letter-spacing: .08em; }
+.scorers > div > div tbody tr { min-height: 4.25rem; }
+.calendar { --calendar-surface: var(--lavender-950); }
+.filters { display: flex; width: fit-content; flex-wrap: wrap; gap: .35rem; padding: .35rem; border: 1px solid rgb(146 35 134 / 38%); border-radius: 999px; background: var(--lavender-950); }
+.filterButton { min-height: 2.5rem; padding-inline: 1rem; }
+.phaseGroup { display: flex; flex-direction: column; gap: .75rem; align-items: flex-start; padding: 1rem 1.1rem; border: 1px solid rgb(146 35 134 / 35%); border-radius: 1rem; background: var(--lavender-950); }
+.phasePills { display: flex; max-width: 100%; flex-wrap: nowrap; justify-content: center; gap: .4rem; overflow-x: auto; padding: .25rem; border-radius: 999px; background: rgb(36 3 32 / 75%); }
+.phasePills button { min-height: 2.5rem; padding-inline: 1rem; }
+.phaseGroup > a { margin-left: .25rem; }
+.fixtureSurface > div { overflow: hidden; border-color: rgb(146 35 134 / 42%); background: var(--lavender-950); }
+.fixtureSurface > div > div:first-child { align-items: center; background: var(--lavender-950); }
+.fixtureSurface > div > div:nth-child(2) > div { background: transparent; }
+.calendar button:focus-visible { outline: 2px solid var(--lavender-400); outline-offset: 3px; }
+@media (min-width: 640px) {
+  .phaseGroup { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+@media (max-width: 639px) {
+  .scorers section ol { grid-template-columns: 1fr; }
+  .phasePills { justify-content: flex-start; }
+  .filters { width: 100%; }
+  .filterButton { flex: 1; padding-inline: .55rem; }
+}

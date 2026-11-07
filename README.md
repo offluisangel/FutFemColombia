@@ -72,7 +72,7 @@ Los datos se actualizan automáticamente todos los días.
 
 - [x] **Clasificación** — Tabla de posiciones con estadísticas completas (PJ, PG, PE, PP, GF, GC, DIF, PTS).
 - [x] **Calendario interactivo** — Navegación por jornadas con flechas, muestra resultados de partidos ya jugados y fecha/hora de los próximos.
-- [x] **Próximos partidos** — Vista de la siguiente jornada con detalles.
+- [x] **Navegación del inicio** — Resumen con próximos partidos y clasificación, Goleadoras con ranking destacado y completo, y Calendario con filtros de próximos encuentros o resultados.
 - [x] **Suscripción a calendario (iCalendar)** — Feeds `.ics` de la liga y de cada equipo para agregarlos a Google Calendar, Apple Calendar u otra app. Los partidos y resultados se actualizan solos. Incluye un panel para copiar el enlace, adaptado a móvil.
 - [x] **Páginas de equipo** — Vista detallada con resultados recientes y próximos partidos.
 - [x] **Fase Final** — Página de cuadrangulares con estructura del formato real.
