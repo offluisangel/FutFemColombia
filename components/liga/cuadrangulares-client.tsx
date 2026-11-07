@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { SiteHeader, type TeamInfo } from "@/components/liga/site-header";
 import { TeamShield } from "@/components/liga/team-shield";
+import styles from "@/components/liga/cuadrangulares-page.module.css";
 import {
   Trophy,
   Swords,
@@ -99,7 +100,7 @@ function StandingsTable({ rows }: { rows: Standing[] }) {
   ];
 
   return (
-    <div className="w-full min-w-0 rounded-xl border border-[color:var(--color-border)]/15 bg-[color:var(--color-card)]/8 overflow-hidden">
+    <div className={`${styles.standings} w-full min-w-0 rounded-xl border border-[color:var(--color-border)]/15 bg-[color:var(--color-card)]/8 overflow-hidden`}>
       <table className="w-full table-fixed text-xs md:text-sm">
         <thead>
           <tr className="border-b border-[color:var(--color-border)]/20 bg-[color:var(--color-card)]/20 text-[color:var(--color-foreground)]/65 uppercase tracking-wider">
@@ -165,7 +166,7 @@ function RealBracketMatchup({ tie }: { tie: Tie }) {
   const away = tie?.away.team?.name ?? "Por definir";
   const legLabel = (match: FinalMatch, index: number, total: number) =>
     match.leg === 2 ? "Vuelta" : match.leg === 1 ? "Ida" : total > 1 ? (index === 0 ? "Ida" : "Vuelta") : "Ida";
-  return <div className="min-w-0 bg-[color:var(--color-card)]/10 border border-[color:var(--color-border)]/20 rounded-xl p-4 md:p-5">
+  return <div className={`${styles.matchup} min-w-0 bg-[color:var(--color-card)]/10 border border-[color:var(--color-border)]/20 rounded-xl p-4 md:p-5`}>
     <div className="flex items-center justify-between gap-3">
       <div className="flex min-w-0 items-center gap-2"><TeamShield teamName={home} shieldUrl={tie?.home.team?.shield_url ?? undefined} sizeClassName="h-9 w-9" /><span className="truncate font-medium">{home}</span></div><span className="text-[color:var(--color-foreground)]/40 font-mono text-xs">vs</span><div className="flex min-w-0 items-center justify-end gap-2"><span className="truncate text-right font-medium">{away}</span><TeamShield teamName={away} shieldUrl={tie?.away.team?.shield_url ?? undefined} sizeClassName="h-9 w-9" /></div>
     </div>
@@ -180,7 +181,7 @@ function EmptyStandingsTable() {
   const rows = Array.from({ length: 4 });
 
   return (
-    <div className="w-full min-w-0 rounded-xl border border-[color:var(--color-border)]/15 bg-[color:var(--color-card)]/8 overflow-hidden">
+    <div className={`${styles.standings} w-full min-w-0 rounded-xl border border-[color:var(--color-border)]/15 bg-[color:var(--color-card)]/8 overflow-hidden`}>
       <table className="w-full table-fixed text-xs md:text-sm">
         <thead>
           <tr className="border-b border-[color:var(--color-border)]/20 bg-[color:var(--color-card)]/20 text-[color:var(--color-foreground)]/60 uppercase tracking-wider">
@@ -336,14 +337,14 @@ export function CuadrangularesClient({
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[color:var(--color-background)] text-[color:var(--color-foreground)]">
+    <main className={`${styles.page} min-h-screen overflow-x-hidden bg-[color:var(--color-background)] text-[color:var(--color-foreground)]`}>
       <SiteHeader teams={teams} />
 
       {/* Hero */}
-      <section className="px-4 md:px-8 pt-28 pb-6 md:pt-20 md:pb-10">
+      <section className={`${styles.hero} px-4 md:px-8 pt-28 pb-6 md:pt-20 md:pb-10`}>
         <div className="container mx-auto max-w-5xl">
-          <div className="flex flex-col items-center text-center">
-            <h1 className="font-serif text-3xl md:text-6xl lg:text-7xl font-black uppercase leading-none tracking-tight mb-3">
+          <div className={`${styles.heroContent} flex flex-col items-center text-center`}>
+            <h1 className={`${styles.title} font-serif text-3xl md:text-6xl lg:text-7xl font-black uppercase leading-none tracking-tight mb-3`}>
               Cuadrangular
               <span className="border-t-[color:var(--color-primary)] text-[color:var(--color-primary)]">
                 /Final
@@ -373,15 +374,15 @@ export function CuadrangularesClient({
               const rows = data?.groups[group] ?? [];
               const matches = groupMatches.filter((match) => match.group_name === group);
               return (
-                <div key={group} id={`grupo-${group.toLowerCase()}`} className="min-w-0 space-y-4 scroll-mt-24">
-                  <div className="min-w-0 overflow-hidden bg-[color:var(--color-card)]/10 border border-[color:var(--color-border)]/15 rounded-2xl p-4 md:p-6">
+                <div key={group} id={`grupo-${group.toLowerCase()}`} className={`${styles.group} min-w-0 space-y-4 scroll-mt-24`}>
+                  <div className={`${styles.groupCard} min-w-0 overflow-hidden bg-[color:var(--color-card)]/10 border border-[color:var(--color-border)]/15 rounded-2xl p-4 md:p-6`}>
                     <h3 className="mb-4 font-serif text-xl font-bold">Grupo {group}</h3>
                     <StandingsTable rows={rows} />
                     <p className="mt-4 text-center font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground)]/40">
                       {rows.length ? "Los dos primeros clasifican a semifinales" : "Aún no hay datos disponibles"}
                     </p>
                   </div>
-                  <div className="min-w-0 rounded-2xl border border-[color:var(--color-border)]/15 bg-[color:var(--color-card)]/8 p-4 md:p-5">
+                  <div className={`${styles.schedule} min-w-0 rounded-2xl border border-[color:var(--color-border)]/15 bg-[color:var(--color-card)]/8 p-4 md:p-5`}>
                     <div className="mb-4 flex items-center justify-between gap-3">
                       <h4 className="min-w-0 truncate font-serif text-lg font-bold">Partidos del Grupo {group}</h4>
                       <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground)]/45">{matches.length} registrados</span>
@@ -411,7 +412,7 @@ export function CuadrangularesClient({
                               const resultText = match.local_score !== null && match.away_score !== null ? `${match.local_score}–${match.away_score}` : formatMatchDate(match.match_date, match.match_time);
 
                               return (
-                                <div key={match.id} className="min-w-0 rounded-xl border border-[color:var(--color-border)]/10 bg-[color:var(--color-card)]/10 p-3">
+                                <div key={match.id} className={`${styles.groupMatch} min-w-0 rounded-xl border border-[color:var(--color-border)]/10 bg-[color:var(--color-card)]/10 p-3`}>
                                   <div className="flex items-center gap-2.5 min-w-0">
                                     {/* Local team */}
                                     <div className="flex min-w-0 flex-1 items-center gap-1.5">
@@ -448,7 +449,7 @@ export function CuadrangularesClient({
       </section>
 
       {/* Bracket Section */}
-      <section className="px-4 md:px-8 pb-12 md:pb-16">
+      <section className={`${styles.bracketSection} px-4 md:px-8 pb-12 md:pb-16`}>
         <div className="container mx-auto max-w-4xl">
           <div className="flex items-center gap-3 mb-8 justify-center">
             <Swords size={18} className="text-[color:var(--color-primary)]" />
@@ -458,7 +459,7 @@ export function CuadrangularesClient({
           </div>
 
           {/* Semifinales */}
-          <div className="mb-4">
+          <div className={`${styles.semifinals} mb-4`}>
             <div className="flex items-center gap-3 mb-6">
               <h3 className="font-mono text-sm uppercase tracking-widest text-[color:var(--color-primary)]/80">
                 Semifinales
@@ -478,7 +479,7 @@ export function CuadrangularesClient({
           </div>
 
           {/* Gran Final */}
-          <div>
+          <div className={styles.final}>
             <div className="flex items-center gap-3 mb-6">
               <h3 className="font-mono text-sm uppercase tracking-widest text-[color:var(--color-primary)]/80">
                 Gran Final
