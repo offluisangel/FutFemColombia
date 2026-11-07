@@ -70,7 +70,7 @@ export function MatchCalendar({
           </h2>
         </div>
 
-        <div className="flex w-full min-w-0 flex-wrap items-center gap-3 md:w-auto">
+        <div className="flex w-full min-w-0 flex-nowrap items-center justify-between gap-1.5 md:w-auto md:justify-start md:gap-3">
           {subscriptionHref && <CalendarSubscription href={subscriptionHref} />}
           <button
             onClick={() => setCurrentMatchday(Math.max(0, currentMatchday - 1))}
@@ -80,8 +80,8 @@ export function MatchCalendar({
           >
             <ChevronLeft size={20} />
           </button>
-          <div className="text-center">
-            <span className="font-mono text-[color:var(--color-primary)] text-sm">
+          <div className="shrink-0 text-center">
+            <span className="whitespace-nowrap font-mono text-[color:var(--color-primary)] text-xs md:text-sm">
               Jornada {matchday.jornada}
             </span>
             <p className="font-mono text-[color:var(--color-foreground-muted)] text-xs">
