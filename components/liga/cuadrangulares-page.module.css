@@ -49,9 +49,24 @@
 }
 
 .standings {
-  border-color: rgb(146 35 134 / 40%);
-  background: rgb(36 3 32 / 70%);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   overflow-x: auto;
+}
+
+.standings thead tr {
+  background: transparent;
+}
+
+.standings tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.groupCard > p {
+  text-align: left;
+  color: var(--lavender-200);
+  line-height: 1.6;
 }
 
 .standings th {
@@ -73,8 +88,20 @@
 
 .schedule > div:first-child {
   align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
   padding-bottom: 0.8rem;
   border-bottom: 1px solid rgb(146 35 134 / 32%);
+}
+
+.schedule h4 {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.schedule > div:first-child > span,
+.schedule > p {
+  color: var(--lavender-200);
 }
 
 .schedule button {
@@ -90,8 +117,19 @@
 }
 
 .groupMatch {
-  border-color: rgb(146 35 134 / 28%);
-  background: rgb(58 8 53 / 58%);
+  padding: 1rem 0;
+  border: 0;
+  border-bottom: 1px solid rgb(146 35 134 / 28%);
+  border-radius: 0;
+  background: transparent;
+}
+
+.groupMatch:last-child {
+  border-bottom: 0;
+}
+
+.groupMatch + .groupMatch {
+  margin-top: 0;
 }
 
 .groupMatch > div > div:nth-child(2) {
@@ -99,8 +137,12 @@
   overflow-wrap: anywhere;
   white-space: normal;
   text-align: center;
-  font-size: 0.72rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.875rem;
   line-height: 1.45;
+  font-variant-numeric: tabular-nums;
 }
 
 .bracketSection {
@@ -110,10 +152,7 @@
 }
 
 .semifinals {
-  padding: 1rem;
-  border: 1px solid rgb(146 35 134 / 34%);
-  border-radius: 1rem;
-  background: rgb(36 3 32 / 42%);
+  padding: 0 0 1rem;
 }
 
 .final {
@@ -123,14 +162,110 @@
   background: rgb(36 3 32 / 84%);
 }
 
-.final .matchup {
-  border-color: rgb(243 113 226 / 48%);
-  background: var(--lavender-950);
+.finalMatchup {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.finalScoreboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding-block: 0.5rem 1.5rem;
+}
+
+.finalTeam {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--lavender-50);
+  font-weight: 600;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.finalAggregate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.finalScore {
+  color: var(--color-primary);
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.finalScoreLabel {
+  color: var(--lavender-200);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.finalLegs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(146 35 134 / 32%);
+  color: var(--lavender-200);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.finalLeg {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.finalLeg strong {
+  color: var(--lavender-50);
+  white-space: nowrap;
 }
 
 .matchup {
   min-width: 0;
   background: rgb(36 3 32 / 82%);
+}
+
+.matchup > div:first-child {
+  min-height: 4rem;
+}
+
+.matchup > div:nth-child(2) {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.matchup > div:nth-child(2) > div {
+  color: var(--lavender-200);
+  font-size: 0.75rem;
+  line-height: 1.75;
+}
+
+.matchup > div:nth-child(2) strong {
+  color: var(--lavender-50);
+  font-variant-numeric: tabular-nums;
+}
+
+.matchup > div:nth-child(2) > .matchupAggregate {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(146 35 134 / 28%);
+  color: var(--color-primary);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .matchup > div:first-child > div {
@@ -151,7 +286,7 @@
 
 @media (max-width: 639px) {
   .groupMatch {
-    padding: 0.65rem;
+    padding-block: 0.75rem;
   }
 
   .groupMatch > div > div:first-child,
@@ -164,7 +299,6 @@
     font-size: 0.75rem;
   }
 
-  .semifinals,
   .final {
     padding: 0.75rem;
   }

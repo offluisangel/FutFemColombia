@@ -172,9 +172,43 @@ function RealBracketMatchup({ tie }: { tie: Tie }) {
     </div>
     <div className="mt-3 border-t border-[color:var(--color-border)]/10 pt-3 space-y-1">
       {tie?.legs.length ? tie.legs.map((match, index) => <div key={match.id} className="flex min-w-0 justify-between gap-2 font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground)]/60"><span className="min-w-0 truncate">{legLabel(match, index, tie.legs.length)}</span><strong className="shrink-0">{match.local_score ?? '—'} - {match.away_score ?? '—'}</strong></div>) : <span className="block text-center font-mono text-[10px] uppercase tracking-wider text-[color:var(--color-foreground)]/30">Partidos por definir</span>}
-      {tie?.aggregate && <div className="pt-2 text-center font-mono text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)]">Global {tie.aggregate.home} - {tie.aggregate.away}</div>}
+      {tie?.aggregate && <div className={`${styles.matchupAggregate} pt-2 text-center font-mono text-xs font-bold uppercase tracking-wider text-[color:var(--color-primary)]`}>Global {tie.aggregate.home} - {tie.aggregate.away}</div>}
     </div>
   </div>;
+}
+
+function FinalMatchup({ tie }: { tie: Tie }) {
+  const home = tie?.home.team?.name ?? "Por definir";
+  const away = tie?.away.team?.name ?? "Por definir";
+
+  return (
+    <div className={styles.finalMatchup}>
+      <div className={styles.finalScoreboard}>
+        <div className={styles.finalTeam}>
+          <TeamShield teamName={home} shieldUrl={tie?.home.team?.shield_url ?? undefined} sizeClassName="h-12 w-12 md:h-16 md:w-16 shrink-0" />
+          <span>{home}</span>
+        </div>
+        <div className={styles.finalAggregate}>
+          <span className={styles.finalScore}>
+            {tie?.aggregate ? `${tie.aggregate.home} - ${tie.aggregate.away}` : "vs"}
+          </span>
+          {tie?.aggregate && <span className={styles.finalScoreLabel}>Global</span>}
+        </div>
+        <div className={styles.finalTeam}>
+          <TeamShield teamName={away} shieldUrl={tie?.away.team?.shield_url ?? undefined} sizeClassName="h-12 w-12 md:h-16 md:w-16 shrink-0" />
+          <span>{away}</span>
+        </div>
+      </div>
+      <div className={styles.finalLegs}>
+        {tie?.legs.length ? tie.legs.map((match, index) => (
+          <div key={match.id} className={styles.finalLeg}>
+            <span>{match.leg === 2 ? "Vuelta" : match.leg === 1 ? "Ida" : index === 0 ? "Ida" : "Vuelta"}</span>
+            <strong>{match.local_score ?? "—"} - {match.away_score ?? "—"}</strong>
+          </div>
+        )) : <span>Partidos por definir</span>}
+      </div>
+    </div>
+  );
 }
 
 function EmptyStandingsTable() {
@@ -490,9 +524,7 @@ export function CuadrangularesClient({
               </span>
             </div>
 
-            <div className="max-w-lg mx-auto">
-              <RealBracketMatchup tie={data?.bracket.final ?? null} />
-            </div>
+            <FinalMatchup tie={data?.bracket.final ?? null} />
           </div>
         </div>
       </section>
